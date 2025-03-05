@@ -1,0 +1,308 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+$white: #fff;
+$white-95p: rgba(255, 255, 255, 0.95);
+$primary-25: #E9EDFC;
+$primary-50: #C9D3F7;
+
+.rooms-wrapper {
+   width: 100%;
+   padding: 40px 0;
+   display: flex;
+   justify-content: center;
+   align-items: flex-start;
+   background: #F5F7F9;
+
+   .rooms-wrapper-inner {
+      width: 1248px;
+
+      .section-header {
+         font-size: 19.2px;
+         line-height: 24px;
+         color: $black-500;
+         font-family: $medium;
+      }
+
+      .all-rooms-layer {
+         margin-top: 16px;
+         width: 100%;
+         display: grid;
+         grid-template-columns: 1fr 1fr;
+         gap: 16px;
+
+         .single-room-wrapper {
+            padding: 24px;
+            border-radius: 16px;
+            background: $white;
+
+            .header-text {
+               width: 100%;
+               margin-bottom: 20px;
+
+               h3 {
+                  font-size: 19.2px;
+                  line-height: 24px;
+                  color: $black-500;
+                  font-family: $semiBold;
+               }
+            }
+
+            .info-wrapper-1 {
+               width: 100%;
+               margin-bottom: 20px;
+
+               ul {
+                  li {
+                     list-style: none;
+                     display: flex;
+                     align-items: center;
+                     margin-bottom: 12px;
+
+                     &:last-child {
+                        margin-bottom: 0;
+                     }
+
+                     img {
+                        margin-right: 8px;
+                     }
+
+                     .image-wrapper {
+                        display: flex;
+                        align-items: center;
+                        margin-right: 8px;
+
+                        img {
+                           margin-right: 4px;
+
+                           &:last-child {
+                              margin-right: 0;
+                           }
+                        }
+                     }
+
+                     span {
+                        font-size: 12px;
+                        line-height: 15px;
+                        color: #757575;
+                        font-family: $regular;
+                     }
+                  }
+               }
+            }
+
+            .info-wrapper-2 {
+               width: 100%;
+               margin-bottom: 20px;
+
+               ul {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: flex-start;
+
+                  li {
+                     list-style: none;
+                     display: flex;
+                     align-items: center;
+                     margin-bottom: 6px;
+                     font-size: 12px;
+                     line-height: 15px;
+                     color: $primary-600;
+                     font-family: $medium;
+                     position: relative;
+
+                     &:nth-child(2) {
+                        cursor: pointer;
+                     }
+
+                     &:last-child {
+                        margin-bottom: 0;
+                     }
+
+                     .cancelation-tooltip {
+                        display: none;
+                        position: absolute;
+                        bottom: calc(100% + 8px);
+                        left: 0;
+                        width: 327px;
+                        background: #5F5F5F;
+                        border-radius: 12px;
+                        padding: 24px;
+
+                        .tooltip-header-text {
+                           font-size: 19.2px;
+                           color: #fff;
+                           margin-bottom: 24px;
+                           font-family: $medium;
+                        }
+
+                        .tooltip-body {
+                           width: 100%;
+
+                           li {
+                              display: flex;
+                              align-items: center;
+                              margin-bottom: 12px;
+
+                              .line {
+                                 min-width: 10px;
+                                 min-height: 30px;
+                                 margin-right: 12px;
+                               
+                                 border-radius: 2px;
+                              }
+
+                              .green{
+                                 background: #4FAC00;
+                              }
+                              .orange{
+                                 background: #F2A200;
+                              }
+                              .red{
+                                 background: #CB1C00;
+                              }
+                              &:last-child {
+                                 margin-bottom: 0;
+                              }
+
+                              span {
+                                 color: #fff;
+                                 font-family: $regular;
+                              }
+                           }
+
+                        }
+                     }
+
+                     img {
+                        margin-left: 6px;
+                     }
+
+                     &:hover .cancelation-tooltip {
+                        display: block;
+                     }
+                  }
+               }
+            }
+
+            .footer-area {
+               width: 100%;
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+
+               .price-layer {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: flex-start;
+
+                  h2 {
+                     font-size: 19px;
+                     line-height: 24px;
+                     color: $black-500;
+                     font-family: $semiBold;
+                     margin-bottom: 6px;
+                  }
+
+                  span {
+                     font-size: 14px;
+                     line-height: 17.5px;
+                     color: #979797;
+                     font-family: $medium;
+                  }
+               }
+
+               button {
+                  width: 181px;
+                  height: 46px;
+                  border: 0;
+                  border-radius: 12px;
+                  background: $primary-600;
+                  outline: none;
+                  font-size: 16px;
+                  line-height: 20px;
+                  color: $white;
+                  font-family: $medium;
+                  cursor: pointer;
+                  transition: all 250ms ease;
+
+                  &:hover {
+                     background: $primary-700;
+                  }
+
+                  &:active {
+                     transform: scale(0.95);
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+
+/////Breakpoint: 1440px down
+@media screen and (max-width: 1440px) {
+   .rooms-wrapper {
+      padding: 40px 96px;
+
+      .rooms-wrapper-inner {
+         width: 100%;
+      }
+   }
+}
+
+@media screen and (min-width: 1201px) {}
+
+/////Breakpoint: 1207px down
+@media screen and (max-width: 1123px) {
+   .rooms-wrapper {
+      padding: 40px 64px;
+
+      .rooms-wrapper-inner {}
+   }
+}
+
+/////Breakpoint: 767px down
+@media screen and (max-width: 767px) {
+   .rooms-wrapper {
+      padding: 40px 40px;
+
+      .rooms-wrapper-inner {
+         .all-rooms-layer {
+            grid-template-columns: 1fr;
+         }
+      }
+   }
+}
+
+/////Breakpoint: 539px down
+@media screen and (max-width: 539px) {
+   .rooms-wrapper {
+      padding: 40px 24px;
+
+      .rooms-wrapper-inner {
+         .all-rooms-layer {
+            .single-room-wrapper {
+               .footer-area {
+                  button {
+                     width: 117px;
+                  }
+               }
+            }
+         }
+      }
+
+      .cancelation-tooltip {
+         left: 50% !important;
+         transform: translateX(-33%) !important;
+         width: 327px !important;
+      }
+   }
+}

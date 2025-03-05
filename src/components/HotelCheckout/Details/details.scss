@@ -1,0 +1,551 @@
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+$white: #fff;
+$white-95p: rgba(255, 255, 255, 0.95);
+$primary-25: #E9EDFC;
+$primary-50: #C9D3F7;
+
+.hotel-checkout-details-wrapper {
+   flex: 3;
+   margin-right: 32px;
+
+   .hotel-info-wrapper {
+      width: 100%;
+      padding: 20px;
+      background: #fff;
+      border-radius: 16px;
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 24px;
+
+      .hotel-header-name {
+         margin-bottom: 32px;
+
+         h3 {
+            font-size: 19.2px;
+            line-height: 24px;
+            color: $black-500;
+            font-family: $semiBold;
+            margin-bottom: 6px;
+         }
+
+         span {
+            font-size: 14px;
+            line-height: 17.5px;
+            color: #979797;
+            font-family: $medium;
+         }
+      }
+
+      .date-wrapper {
+         width: 100%;
+         padding: 16px;
+         border-radius: 8px;
+         background: #F5F7F9;
+
+         .check-in,
+         .check-out {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            span {
+               font-size: 14px;
+               line-height: 17.5px;
+               color: #757575;
+               font-family: $medium;
+            }
+
+            h3 {
+               font-size: 14px;
+               line-height: 17.5px;
+               color: $black-500;
+               font-family: $semiBold;
+            }
+         }
+
+         .check-in {
+            margin-bottom: 16px;
+         }
+      }
+   }
+
+   .contact-details-wrapper {
+      width: 100%;
+      padding: 20px;
+      background: #fff;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 24px;
+
+      h3 {
+         font-size: 16px;
+         line-height: 20px;
+         color: $black-500;
+         font-family: $medium;
+         margin-bottom: 24px;
+      }
+
+      .email-wrapper {
+         display: flex;
+         flex-direction: column;
+         align-items: flex-start;
+         width: 290px;
+
+         label {
+            color: #B1B1B1;
+            font-size: 14px;
+            line-height: 17.5px;
+            font-family: $medium;
+         }
+
+         input {
+            width: 100%;
+            height: 49px;
+            margin-top: 8px;
+            padding: 15.5px 20px;
+            border: 1px solid #E5E5E5;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            line-height: 17.5px;
+            color: $black-500;
+            font-family: $medium;
+         }
+      }
+   }
+
+   .primary-passenger-wrapper {
+      width: 100%;
+      padding: 20px;
+      background: #fff;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 24px;
+
+      .other-guest-area {
+         width: 100%;
+      }
+
+      .form-header-text {
+         width: 100%;
+         display: flex;
+         align-items: center;
+         margin-bottom: 24px;
+
+         .remove-button {
+            width: 24px;
+            height: 24px;
+            border-radius: 70px;
+            background: #FBE2E2;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 250ms ease;
+            user-select: none;
+
+            &:active {
+               transform: scale(0.95);
+            }
+         }
+      }
+
+      h3 {
+         font-size: 16px;
+         line-height: 20px;
+         color: $black-500;
+         font-family: $medium;
+      }
+
+      .form-area {
+         width: 100%;
+
+         .name-surname-wrapper {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+
+            .name-wrapper,
+            .surname-wrapper {
+               flex: 1;
+               margin-right: 12px;
+               display: flex;
+               flex-direction: column;
+               align-items: flex-start;
+
+               label {
+                  color: #B1B1B1;
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  font-family: $medium;
+               }
+
+               input {
+                  width: 100%;
+                  height: 49px;
+                  margin-top: 8px;
+                  padding: 15.5px 20px;
+                  border: 1px solid #E5E5E5;
+                  border-radius: 8px;
+                  outline: none;
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  color: $black-500;
+                  font-family: $medium;
+               }
+            }
+
+            .surname-wrapper {
+               margin-right: 0;
+            }
+         }
+
+         .citizenship-wrapper {
+            width: 100%;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+
+            label {
+               color: #B1B1B1;
+               font-size: 14px;
+               line-height: 17.5px;
+               font-family: $medium;
+            }
+
+            .select-wrapper {
+               width: 100%;
+               margin-top: 8px;
+               position: relative;
+
+               img {
+                  position: absolute;
+                  top: 50%;
+                  right: 20px;
+               }
+
+               select {
+                  width: 100%;
+                  height: 49px;
+                  padding: 0 20px;
+                  border: 1px solid #E5E5E5;
+                  border-radius: 8px;
+                  outline: none;
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  color: $black-500;
+                  font-family: $medium;
+                  -webkit-appearance: none;
+                  -moz-appearance: none;
+                  cursor: pointer;
+               }
+
+               select::-ms-expand {
+                  display: none;
+               }
+            }
+         }
+      }
+
+      .add-another-button {
+         width: 100%;
+         height: 60px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+
+         button {
+            background: transparent;
+            border: 0;
+            outline: none;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            line-height: 20px;
+            color: $primary-600;
+            font-family: $medium;
+            cursor: pointer;
+            transition: all 250ms ease;
+            user-select: none;
+
+            &:active {
+               transform: scale(0.95);
+            }
+
+            img {
+               margin-right: 12px;
+            }
+         }
+      }
+   }
+
+   .terms-booking-wrapper {
+      width: 100%;
+      padding: 20px;
+      background: #fff;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      h3 {
+         font-size: 16px;
+         line-height: 20px;
+         color: $black-500;
+         font-family: $medium;
+         margin-bottom: 24px;
+      }
+
+      ul {
+         padding-left: 20px;
+         margin-bottom: 24px;
+
+         li {
+            list-style: none;
+            color: #979797;
+            font-size: 14px;
+            line-height: 17.5px;
+            font-family: $regular;
+            align-self: stretch;
+            position: relative;
+
+            &::before {
+               content: '';
+               position: absolute;
+               top: 6px;
+               left: -12px;
+               width: 4px;
+               height: 4px;
+               border-radius: 5px;
+               background: #979797;
+               z-index: 2;
+            }
+         }
+      }
+
+      p {
+         color: #979797;
+         font-size: 14px;
+         line-height: 17.5px;
+         font-family: $regular;
+         margin-bottom: 24px;
+
+         span {
+            color: $primary-600;
+            cursor: pointer;
+
+            &:hover {
+               color: $primary-700;
+               text-decoration: underline;
+            }
+         }
+      }
+
+      div {
+         width: 100%;
+      }
+
+      button {
+         padding: 16px 60px;
+         height: 52px;
+         background: $primary-600;
+         color: $white;
+         font-size: 16px;
+         line-height: 20px;
+         font-family: $medium;
+         border: 0;
+         border-radius: 12px;
+         cursor: pointer;
+         transition: all 250ms ease;
+
+         &:last-child {
+            padding: 0;
+            background: transparent;
+            color: $primary-600;
+
+
+            &:hover {
+               background: transparent;
+               color: $primary-600;
+            }
+         }
+
+         &:active {
+            transform: scale(0.95);
+         }
+
+         &:hover {
+            background: $primary-700;
+         }
+
+         &:last-child {
+            margin-left: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            a {
+               min-width: 70px;
+               text-decoration: none;
+               color: $primary-600;
+
+               &:hover {
+                  color: $primary-700;
+                  text-decoration: underline;
+               }
+            }
+
+            .info-box {
+               margin-left: 8px;
+               height: 20px;
+               width: 20px;
+               position: relative;
+
+               .cancelation-tooltip {
+                  display: none;
+                  position: absolute;
+                  bottom: calc(100% + 8px);
+                  left: -150px;
+                  width: 327px;
+                  background: #3E3E3E;
+                  border-radius: 12px;
+                  padding: 24px;
+
+                  .tooltip-header-text {
+                     font-size: 19.2px;
+                     color: #fff;
+                     margin-bottom: 24px;
+                     font-family: $medium;
+                  }
+
+                  .tooltip-body {
+                     width: 100%;
+                     padding-left: 0;
+                     margin-bottom: 0;
+
+                     li {
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 12px;
+                        list-style: none !important;
+
+                        .line {
+                           min-width: 10px;
+                           width: 10px;
+                           min-height: 30px;
+                           margin-right: 12px;
+                           background: #4FAC00;
+                           border-radius: 2px;
+                        }
+
+                        &:last-child {
+                           margin-bottom: 0;
+                        }
+
+                        span {
+                           color: #fff;
+                           font-family: $regular;
+                           text-align: left;
+                        }
+
+                        &:nth-child(2) .line {
+                           background: #F2A200;
+                        }
+
+                        &:nth-child(3) .line {
+                           background: #CB1C00;
+                        }
+
+                        &::before {
+                           display: none;
+                        }
+                     }
+
+                  }
+               }
+
+               img {
+                  width: 20px;
+                  height: 20px;
+                  margin-left: 0;
+               }
+
+               &:hover .cancelation-tooltip {
+                  display: block;
+               }
+            }
+         }
+      }
+   }
+}
+
+/////Breakpoint: 1155px down
+@media screen and (max-width: 1155px) {
+   .hotel-checkout-details-wrapper {
+      margin-right: 24px;
+
+      .contact-details-wrapper {
+         .email-wrapper {
+            width: 100%;
+
+            input {
+               width: 100%;
+            }
+         }
+      }
+
+      .terms-booking-wrapper {
+         button {
+            width: 100%;
+            margin-bottom: 10px;
+
+            &:last-child {
+               margin-left: 0;
+            }
+         }
+      }
+   }
+}
+
+/////Breakpoint: 849px down
+@media screen and (max-width: 849px) {
+   .hotel-checkout-details-wrapper {
+      margin-right: 0;
+
+      .hotel-info-wrapper {
+         display: flex;
+      }
+
+      .primary-passenger-wrapper {
+         .form-area {
+            .name-surname-wrapper {
+               flex-direction: column;
+               margin-bottom: 0;
+
+               .name-wrapper,
+               .surname-wrapper {
+                  width: 100%;
+                  margin-right: 0;
+                  margin-bottom: 20px;
+               }
+            }
+         }
+      }
+   }
+}

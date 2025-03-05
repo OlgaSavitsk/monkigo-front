@@ -1,0 +1,1289 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+$white: #fff;
+$white-95p: rgba(255, 255, 255, 0.95);
+$primary-25: #E9EDFC;
+$primary-50: #C9D3F7;
+
+.hotels-results-search-section {
+   width: 100%;
+   padding-inline: 96px;
+   padding-block: 36px;
+   display: flex;
+   justify-content: center;
+   background-color: #274DE0;
+
+   .search-section-inner {
+      width: 100%;
+
+      //HEADER DROPDOWN SECTION
+      .header-dropdown-section {
+         margin-bottom: 24px;
+
+         ul:first-child {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+
+            .list-wrapper {
+               position: relative;
+            }
+
+            li {
+               width: 150px;
+               list-style: none;
+               display: flex;
+               align-items: center;
+               color: #fff;
+               font-size: 14px;
+               font-family: $medium;
+               line-height: 17.5px;
+               cursor: pointer;
+               transition: all 250ms ease;
+               user-select: none;
+
+               &:last-child {
+                  margin-right: 0;
+               }
+
+               svg {
+                  margin-left: 7px;
+                  transition: all 250ms ease;
+
+                  path {
+                     transition: all 250ms ease;
+                  }
+               }
+
+               &:hover {
+                  color: $white-95p;
+
+                  svg path {
+                     fill: $white-95p;
+                  }
+               }
+            }
+
+            .mobile-guests-rooms-popup-wrapper {
+               position: fixed;
+               top: 0;
+               left: 0;
+               z-index: 9;
+               display: none;
+               align-items: flex-end;
+               justify-content: center;
+               width: 100%;
+               height: 100%;
+               background: rgba(0, 0, 0, 0.5);
+
+               .mobile-guests-rooms-popup-inner {
+                  width: 100%;
+                  border-radius: 20px 20px 0 0;
+                  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.07), 0px 12px 24px -350px rgba(0, 0, 0, 0.1);
+                  background: #fff;
+                  padding: 32px 24px;
+                  z-index: 2;
+                  user-select: none;
+                  transition: all 250ms ease;
+
+                  .dropdown-list {
+
+                     .list-item {
+                        width: 100%;
+                        list-style: none;
+                        cursor: pointer;
+                        color: rgba(117, 117, 117, 1);
+                        transition: all 250ms ease;
+                        padding-block: 24px;
+                        border-bottom: 1px solid rgba(227, 227, 227, 1);
+
+                        &:first-child {
+                           padding-top: 0;
+                        }
+
+                        &:last-child {
+                           padding-bottom: 0;
+                        }
+
+                        .item-wrapper {
+                           width: 100%;
+                           display: flex;
+                           align-items: center;
+                           justify-content: space-between;
+
+                           .item-content {
+                              display: flex;
+                              flex-direction: column;
+
+                              .title {
+                                 font-size: 14px;
+                                 font-family: $medium;
+                                 line-height: 17.5px;
+                                 color: #131313;
+                                 margin-bottom: 2px;
+                              }
+
+                              .description {
+                                 font-size: 12px;
+                                 font-family: $medium;
+                                 line-height: 15px;
+                                 color: rgba(117, 117, 117, 1);
+                              }
+                           }
+
+                           .item-counter {
+                              display: flex;
+                              align-items: center;
+
+                              button {
+                                 width: 24px;
+                                 height: 24px;
+                                 border-radius: 50px;
+                                 background: rgba(232, 242, 255, 1);
+                                 border: 0;
+                                 color: #131313;
+                                 font-size: 12px;
+                                 font-family: $medium;
+                                 line-height: 15px;
+                                 outline: none;
+                                 transition: all 250ms ease;
+                                 cursor: pointer;
+
+                                 &:disabled {
+                                    background: rgba(245, 247, 249, 1);
+                                 }
+                              }
+
+                              .count-text {
+                                 font-size: 12px;
+                                 font-family: $medium;
+                                 line-height: 15px;
+                                 color: #131313;
+                                 margin-inline: 10px;
+                              }
+                           }
+                        }
+
+                        .child-age-wrapper {
+
+                           .child-age-inner {
+                              margin-top: 12px;
+
+                              &:first-child {
+                                 margin-top: 24px;
+                              }
+
+                              .title {
+                                 font-size: 12px;
+                                 font-family: $medium;
+                                 color: rgba(177, 177, 177, 1);
+                              }
+
+                              .counter-wrapper {
+                                 width: 100%;
+                                 padding: 18.5px 25px;
+                                 display: flex;
+                                 align-items: center;
+                                 justify-content: space-between;
+                                 border-radius: 10px;
+                                 border: 1px solid rgba(227, 227, 227, 1);
+                                 margin-top: 8px;
+
+                                 span {
+                                    color: #131313;
+                                    font-size: 14px;
+                                    font-family: $semiBold;
+                                 }
+
+                                 input {
+                                    color: #131313;
+                                    font-size: 14px;
+                                    font-family: $medium;
+                                    border: 0;
+                                    width: 15px;
+                                    text-align: center;
+                                    outline: none;
+                                 }
+
+                                 /* Chrome, Safari, Edge, Opera */
+                                 input::-webkit-outer-spin-button,
+                                 input::-webkit-inner-spin-button {
+                                    -webkit-appearance: none;
+                                    margin: 0;
+                                 }
+
+                                 /* Firefox */
+                                 input[type=number] {
+                                    -moz-appearance: textfield;
+                                 }
+
+                                 button {
+                                    width: 20px;
+                                    background: transparent;
+                                    border: 0;
+                                    color: rgba(117, 117, 117, 1);
+                                    font-size: 12px;
+                                    font-family: $medium;
+                                    line-height: 15px;
+                                    outline: none;
+                                    transition: all 250ms ease;
+                                    cursor: pointer;
+
+                                    &:disabled {
+                                       background: rgba(245, 247, 249, 1);
+                                       cursor: no-drop;
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+
+                     .dropdown-buttons {
+                        width: 100%;
+                        height: 46px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        margin-top: 32px;
+
+                        .close-button {
+                           width: 100%;
+                           height: 100%;
+                           border: 0;
+                           background: #F5F7F9;
+                           border-radius: 12px;
+                           cursor: pointer;
+                           font-size: 16px;
+                           line-height: 20px;
+                           color: $black-500;
+                           font-family: $medium;
+                           margin-right: 12px;
+                           transition: all 250ms ease;
+
+                           &:hover {
+                              background: #ECEEF0;
+                           }
+
+                           &:active {
+                              transform: scale(0.95);
+                           }
+                        }
+
+                        .save-button {
+                           width: 100%;
+                           height: 48px;
+                           border: 0;
+                           background: $primary-600;
+                           border-radius: 12px;
+                           cursor: pointer;
+                           font-size: 16px;
+                           line-height: 20px;
+                           color: $white;
+                           font-family: $medium;
+                           transition: all 250ms ease;
+
+                           &:hover {
+                              background: $primary-700;
+                           }
+
+                           &:active {
+                              transform: scale(0.95);
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      // BODY DROPDOWN SECTION
+      .body-dropdown-section {
+         width: 100%;
+         display: flex;
+         align-items: flex-end;
+
+         .set-date-button-disable {
+            background: #6882E9;
+
+            &:active {
+               transform: scale(1);
+            }
+         }
+
+         .react-calendar__tile--now {
+            background: transparent !important;
+         }
+
+         .react-calendar__tile--active {
+            background: $primary-600 !important;
+         }
+
+         //SECTION WRAPPER DESKTOP
+         .section-wrapper-desktop {
+            width: 100%;
+            display: flex;
+            align-items: center;
+
+            .MuiDateRangePickerInput-root {
+               width: 200%;
+            }
+
+            // GOING TO SECTION
+            .going_to-section {
+               display: flex;
+               align-items: center;
+               margin-right: 8px;
+               width: 100%;
+
+               //Going to
+               .going_to {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  position: relative;
+
+                  button {
+                     width: 100%;
+                     height: 49px;
+                     border-radius: 12px;
+                     border: 1px solid #E3E3E3;
+                     background: #E9EDFC;
+                     font-size: 14px;
+                     font-family: $regular;
+                     line-height: 17.5px;
+                     color: #979797;
+                     text-align: left;
+                     padding: 15.5px 21px 15.5px 25px;
+                     cursor: pointer;
+                     transition: all 250ms ease;
+                     display: flex;
+                     align-items: center;
+                     overflow: hidden;
+
+                     label {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer;
+                     }
+
+                     span {
+                        margin-left: 10px;
+                        font-size: 14px;
+                        line-height: 17.5px;
+                        font-family: $medium;
+                        color: #5F5F5F;
+                     }
+                  }
+               }
+            }
+
+
+
+            .check_in-section {
+               display: flex;
+               align-items: center;
+               width: 100%;
+
+               //CHECK IN
+               .check_in {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  margin-right: 8px;
+                  position: relative;
+
+                  .check-in-dropdown {
+                     left: 0 !important;
+                     transform: translateX(0) !important;
+                  }
+
+                  .check-in-button {
+                     width: 100%;
+                     height: 49px;
+                     border-radius: 12px;
+                     border: 1px solid #E3E3E3;
+                     background: #fff;
+                     font-size: 14px;
+                     font-family: $regular;
+                     line-height: 17.5px;
+                     color: rgba(177, 177, 177, 1);
+                     text-align: left;
+                     padding: 15.5px 21px 15.5px 25px;
+                     cursor: pointer;
+                     transition: all 250ms ease;
+                     position: relative;
+
+                     label {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer;
+                     }
+
+                     &:active {
+                        transform: scale(0.95);
+                     }
+
+                     .check-in-input {
+                        margin-left: 10px;
+                        border: 0;
+                        outline: 0;
+                        font-family: $medium;
+                        color: rgba(44, 44, 44, 1);
+                     }
+                  }
+               }
+            }
+
+            // CHECK IN CHECK OUT SECTION
+            .check_out-section {
+               display: flex;
+               align-items: center;
+               width: 100%;
+
+               //Check Out 
+               .check_out {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  position: relative;
+                  margin-right: 8px;
+
+                  .check-out-dropdown {
+                     left: auto;
+                     right: 0 !important;
+                     transform: translateX(0) !important;
+                  }
+
+                  .check-out-button {
+                     width: 100%;
+                     height: 49px;
+                     border-radius: 12px;
+                     border: 1px solid #E3E3E3;
+                     background: #fff;
+                     font-size: 14px;
+                     font-family: $regular;
+                     line-height: 17.5px;
+                     color: rgba(177, 177, 177, 1);
+                     text-align: left;
+                     padding: 15.5px 21px 15.5px 25px;
+                     cursor: pointer;
+                     transition: all 250ms ease;
+                     position: relative;
+
+                     label {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer;
+                     }
+
+                     &:active {
+                        transform: scale(0.95);
+                     }
+
+                     .check-out-input {
+                        margin-left: 10px;
+                        border: 0;
+                        outline: 0;
+                        font-family: $medium;
+                        color: rgba(44, 44, 44, 1);
+                        user-zoom: none;
+                     }
+                  }
+               }
+
+
+            }
+
+            .search-button {
+               min-width: 96px;
+               height: 49px;
+               border-radius: 10px;
+               background: #FFD05C;
+               border: 0;
+               cursor: pointer;
+               transition: all 250ms ease;
+
+               &:active {
+                  transform: scale(0.95);
+               }
+            }
+         }
+
+         //SECTION WRAPPER TABLET
+         .section-wrapper-tablet {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+
+            // GOING TO SECTION
+            .going_to-section {
+               display: flex;
+               align-items: center;
+               margin-bottom: 8px;
+               padding-right: 104px;
+               width: 100%;
+
+               //Going to
+               .going_to {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  position: relative;
+
+                  button {
+                     width: 100%;
+                     height: 49px;
+                     border-radius: 12px;
+                     border: 1px solid #E3E3E3;
+                     background: #E9EDFC;
+                     font-size: 14px;
+                     font-family: $regular;
+                     line-height: 17.5px;
+                     color: rgba(177, 177, 177, 1);
+                     text-align: left;
+                     padding: 15.5px 21px 15.5px 25px;
+                     cursor: pointer;
+                     transition: all 250ms ease;
+                     display: flex;
+                     align-items: center;
+                     overflow: hidden;
+
+                     label {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer;
+                     }
+
+                     span {
+                        margin-left: 10px;
+                        font-size: 14px;
+                        line-height: 17.5px;
+                        font-family: $medium;
+                        color: #5F5F5F;
+                     }
+                  }
+               }
+            }
+
+            .second-section {
+               width: 100%;
+               display: flex;
+               align-items: center;
+
+               .MuiDateRangePickerInput-root {
+                  width: 100%;
+               }
+
+               .check_in-section {
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+
+                  //CHECK IN
+                  .check_in {
+                     width: 100%;
+                     display: flex;
+                     align-items: center;
+                     margin-right: 8px;
+                     position: relative;
+
+                     .check-in-dropdown {
+                        left: 0 !important;
+                        transform: translateX(0) !important;
+                     }
+
+                     .check-in-button {
+                        width: 100%;
+                        height: 49px;
+                        border-radius: 12px;
+                        border: 1px solid #E3E3E3;
+                        background: #fff;
+                        font-size: 14px;
+                        font-family: $regular;
+                        line-height: 17.5px;
+                        color: rgba(177, 177, 177, 1);
+                        text-align: left;
+                        padding: 15.5px 21px 15.5px 25px;
+                        cursor: pointer;
+                        transition: all 250ms ease;
+                        display: flex;
+                        align-items: center;
+                        position: relative;
+
+                        label {
+                           position: absolute;
+                           top: 0;
+                           left: 0;
+                           width: 100%;
+                           height: 100%;
+                           cursor: pointer;
+                        }
+
+                        &:active {
+                           transform: scale(0.95);
+                        }
+
+                        span {
+                           width: 60px;
+                        }
+
+                        .check-in-input {
+                           margin-left: 10px;
+                           border: 0;
+                           outline: 0;
+                           font-family: $medium;
+                           color: rgba(44, 44, 44, 1);
+                           user-zoom: none;
+                        }
+                     }
+                  }
+               }
+
+               // CHECK IN CHECK OUT SECTION
+               .check_out-section {
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+
+                  //Check Out 
+                  .check_out {
+                     width: 100%;
+                     display: flex;
+                     align-items: center;
+                     position: relative;
+                     margin-right: 8px;
+
+                     .check-out-dropdown {
+                        left: auto;
+                        right: 0 !important;
+                        transform: translateX(0) !important;
+                     }
+
+                     .check-out-button {
+                        width: 100%;
+                        height: 49px;
+                        border-radius: 12px;
+                        border: 1px solid #E3E3E3;
+                        background: #fff;
+                        font-size: 14px;
+                        font-family: $regular;
+                        line-height: 17.5px;
+                        color: rgba(177, 177, 177, 1);
+                        text-align: left;
+                        padding: 15.5px 21px 15.5px 25px;
+                        cursor: pointer;
+                        transition: all 250ms ease;
+                        display: flex;
+                        align-items: center;
+                        position: relative;
+
+                        label {
+                           position: absolute;
+                           top: 0;
+                           left: 0;
+                           width: 100%;
+                           height: 100%;
+                           cursor: pointer;
+                        }
+
+                        &:active {
+                           transform: scale(0.95);
+                        }
+
+                        span {
+                           width: 75px;
+                        }
+
+                        .check-out-input {
+                           margin-left: 10px;
+                           border: 0;
+                           outline: 0;
+                           font-family: $medium;
+                           color: rgba(44, 44, 44, 1);
+                           user-zoom: none;
+                        }
+                     }
+                  }
+
+
+               }
+
+               .search-button {
+                  min-width: 96px;
+                  height: 49px;
+                  border-radius: 10px;
+                  background: #FFD05C;
+                  border: 0;
+                  cursor: pointer;
+                  transition: all 250ms ease;
+
+                  &:active {
+                     transform: scale(0.95);
+                  }
+               }
+            }
+         }
+
+         //SECTION WRAPPER TABLET
+         .section-wrapper-tablet-small {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+
+            // GOING TO SECTION
+            .going_to-section {
+               display: flex;
+               align-items: center;
+               margin-bottom: 8px;
+               width: 100%;
+
+               //Going to
+               .going_to {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  position: relative;
+
+                  button {
+                     width: 100%;
+                     height: 49px;
+                     border-radius: 12px;
+                     border: 1px solid #E3E3E3;
+                     background: #E9EDFC;
+                     font-size: 14px;
+                     font-family: $regular;
+                     line-height: 17.5px;
+                     color: rgba(177, 177, 177, 1);
+                     text-align: left;
+                     padding: 15.5px 21px 15.5px 25px;
+                     cursor: pointer;
+                     transition: all 250ms ease;
+                     display: flex;
+                     align-items: center;
+                     overflow: hidden;
+
+                     label {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer;
+                     }
+
+                     span {
+                        margin-left: 10px;
+                        font-size: 14px;
+                        line-height: 17.5px;
+                        font-family: $medium;
+                        color: #5F5F5F;
+                     }
+                  }
+               }
+            }
+
+            .MuiDateRangePickerInput-root {
+               width: 100%;
+            }
+
+            .second-section {
+               display: flex;
+               align-items: center;
+               width: 100%;
+               margin-bottom: 8px;
+
+               .check_in-section {
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+
+                  //CHECK IN
+                  .check_in {
+                     width: 100%;
+                     display: flex;
+                     align-items: center;
+                     margin-right: 8px;
+                     position: relative;
+
+                     .check-in-dropdown {
+                        left: 0 !important;
+                        transform: translateX(0) !important;
+                     }
+
+                     .check-in-button {
+                        width: 100%;
+                        height: 49px;
+                        border-radius: 12px;
+                        border: 1px solid #E3E3E3;
+                        background: #fff;
+                        font-size: 14px;
+                        font-family: $regular;
+                        line-height: 17.5px;
+                        color: rgba(177, 177, 177, 1);
+                        text-align: left;
+                        padding: 15.5px 21px 15.5px 25px;
+                        cursor: pointer;
+                        transition: all 250ms ease;
+                        display: flex;
+                        align-items: center;
+                        position: relative;
+
+                        label {
+                           position: absolute;
+                           top: 0;
+                           left: 0;
+                           width: 100%;
+                           height: 100%;
+                           cursor: pointer;
+                        }
+
+                        &:active {
+                           transform: scale(0.95);
+                        }
+
+                        span {
+                           min-width: 60px;
+                        }
+
+                        .check-in-input {
+                           margin-left: 10px;
+                           border: 0;
+                           outline: 0;
+                           font-family: $medium;
+                           color: rgba(44, 44, 44, 1);
+                           width: 100%;
+                           user-zoom: none;
+                        }
+                     }
+                  }
+               }
+
+               // CHECK IN CHECK OUT SECTION
+               .check_out-section {
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+
+                  //Check Out 
+                  .check_out {
+                     width: 100%;
+                     display: flex;
+                     align-items: center;
+                     position: relative;
+
+                     .check-out-dropdown {
+                        left: auto;
+                        right: 0 !important;
+                        transform: translateX(0) !important;
+                     }
+
+                     .check-out-button {
+                        width: 100%;
+                        height: 49px;
+                        border-radius: 12px;
+                        border: 1px solid #E3E3E3;
+                        background: #fff;
+                        font-size: 14px;
+                        font-family: $regular;
+                        line-height: 17.5px;
+                        color: rgba(177, 177, 177, 1);
+                        text-align: left;
+                        padding: 15.5px 21px 15.5px 25px;
+                        cursor: pointer;
+                        transition: all 250ms ease;
+                        display: flex;
+                        align-items: center;
+                        position: relative;
+
+                        label {
+                           position: absolute;
+                           top: 0;
+                           left: 0;
+                           width: 100%;
+                           height: 100%;
+                           cursor: pointer;
+                        }
+
+                        &:active {
+                           transform: scale(0.95);
+                        }
+
+                        span {
+                           min-width: 75px;
+                        }
+
+                        .check-out-input {
+                           margin-left: 10px;
+                           border: 0;
+                           outline: 0;
+                           font-family: $medium;
+                           color: rgba(44, 44, 44, 1);
+                           width: 100%;
+                           user-zoom: none;
+                        }
+                     }
+                  }
+
+
+               }
+
+            }
+
+            .search-button {
+               width: 100%;
+               height: 49px;
+               border-radius: 10px;
+               background: #FFD05C;
+               border: 0;
+               font-size: 16px;
+               line-height: 20px;
+               font-family: $medium;
+               color: $black-500;
+               cursor: pointer;
+               transition: all 250ms ease;
+
+               &:active {
+                  transform: scale(0.95);
+               }
+            }
+         }
+
+         //SECTION WRAPPER TABLET
+         .section-wrapper-mobile {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+
+            // GOING TO SECTION
+            .going_to-section {
+               display: flex;
+               align-items: center;
+               margin-bottom: 8px;
+               width: 100%;
+
+               //Going to
+               .going_to {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  position: relative;
+
+                  button {
+                     width: 100%;
+                     height: 49px;
+                     border-radius: 12px;
+                     border: 1px solid #E3E3E3;
+                     background: #E9EDFC;
+                     font-size: 14px;
+                     font-family: $regular;
+                     line-height: 17.5px;
+                     color: rgba(177, 177, 177, 1);
+                     text-align: left;
+                     padding: 15.5px 21px 15.5px 25px;
+                     cursor: pointer;
+                     transition: all 250ms ease;
+                     display: flex;
+                     align-items: center;
+                     overflow: hidden;
+
+                     label {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer;
+                     }
+
+                     span {
+                        margin-left: 10px;
+                        font-size: 14px;
+                        line-height: 17.5px;
+                        font-family: $medium;
+                        color: #5F5F5F;
+                     }
+                  }
+               }
+            }
+
+            .MuiDateRangePickerInput-root {
+               flex-direction: column;
+               width: 100%;
+            }
+
+            .check_in-section {
+               display: flex;
+               align-items: center;
+               width: 100%;
+               margin-bottom: 8px;
+
+               //CHECK IN
+               .check_in {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  position: relative;
+
+                  .check-in-dropdown {
+                     left: 0 !important;
+                     transform: translateX(0) !important;
+                  }
+
+                  .check-in-button {
+                     width: 100%;
+                     height: 49px;
+                     border-radius: 12px;
+                     border: 1px solid #E3E3E3;
+                     background: #fff;
+                     font-size: 14px;
+                     font-family: $regular;
+                     line-height: 17.5px;
+                     color: rgba(177, 177, 177, 1);
+                     text-align: left;
+                     padding: 15.5px 21px 15.5px 25px;
+                     cursor: pointer;
+                     transition: all 250ms ease;
+                     display: flex;
+                     align-items: center;
+                     position: relative;
+
+                     label {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer;
+                     }
+
+                     &:active {
+                        transform: scale(0.95);
+                     }
+
+                     span {
+                        min-width: 60px;
+                     }
+
+                     .check-in-input {
+                        margin-left: 10px;
+                        border: 0;
+                        outline: 0;
+                        font-family: $medium;
+                        color: rgba(44, 44, 44, 1);
+                        width: 100%;
+                        user-zoom: none;
+                     }
+                  }
+               }
+            }
+
+            // CHECK IN CHECK OUT SECTION
+            .check_out-section {
+               display: flex;
+               align-items: center;
+               width: 100%;
+               margin-bottom: 8px;
+
+               //Check Out 
+               .check_out {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  position: relative;
+
+                  .check-out-dropdown {
+                     left: auto;
+                     right: 0 !important;
+                     transform: translateX(0) !important;
+                  }
+
+                  .check-out-dropdown {
+                     right: 0 !important;
+                     transform: translateX(0) !important;
+                  }
+
+                  .check-out-button {
+                     width: 100%;
+                     height: 49px;
+                     border-radius: 12px;
+                     border: 1px solid #E3E3E3;
+                     background: #fff;
+                     font-size: 14px;
+                     font-family: $regular;
+                     line-height: 17.5px;
+                     color: rgba(177, 177, 177, 1);
+                     text-align: left;
+                     padding: 15.5px 21px 15.5px 25px;
+                     cursor: pointer;
+                     transition: all 250ms ease;
+                     display: flex;
+                     align-items: center;
+                     position: relative;
+
+                     label {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        cursor: pointer;
+                     }
+
+                     &:active {
+                        transform: scale(0.95);
+                     }
+
+                     span {
+                        min-width: 75px;
+                     }
+
+                     .check-out-input {
+                        margin-left: 10px;
+                        border: 0;
+                        outline: 0;
+                        font-family: $medium;
+                        color: rgba(44, 44, 44, 1);
+                        width: 100%;
+                        user-zoom: none;
+                     }
+                  }
+               }
+
+
+            }
+
+            .search-button {
+               width: 100%;
+               height: 49px;
+               border-radius: 10px;
+               background: #FFD05C;
+               border: 0;
+               font-size: 16px;
+               line-height: 20px;
+               font-family: $medium;
+               color: $black-500;
+               cursor: pointer;
+               transition: all 250ms ease;
+
+               &:active {
+                  transform: scale(0.95);
+               }
+            }
+         }
+      }
+   }
+}
+
+/////Breakpoint: 1500px up
+@media screen and (min-width: 1441px) {
+   .hotels-results-search-section .search-section-inner {
+      width: 1248px;
+   }
+}
+
+/////Breakpoint: 1500px down
+@media screen and (min-width: 1208px) and (max-width: 1440px) {
+   .hotels-results-search-section {
+      padding-inline: 96px;
+   }
+}
+
+// ///Breakpoint: 1350px up
+// @media screen and (min-width: 1350px) {}
+
+/////Breakpoint: 1350px down
+@media screen and (min-width: 768px) and (max-width: 1208px) {
+   .hotels-results-search-section {
+      padding-inline: 64px;
+
+      .search-section-inner {
+         width: 895px;
+
+         .body-dropdown-section {
+            .section-wrapper-desktop {
+               display: none;
+            }
+
+            .section-wrapper-tablet {
+               display: flex;
+            }
+         }
+      }
+   }
+}
+
+/////Breakpoint: 850px down
+@media screen and (min-width: 540px) and (max-width: 767px) {
+   .hotels-results-search-section {
+      padding-inline: 40px;
+
+      .search-section-inner {
+         .body-dropdown-section {
+
+            .section-wrapper-desktop {
+               display: none;
+            }
+
+            .section-wrapper-tablet {
+               display: none;
+            }
+
+            .section-wrapper-tablet-small {
+               display: flex;
+            }
+         }
+      }
+   }
+}
+
+/////Breakpoint: 630px down
+@media screen and (max-width: 539px) {
+   .hotels-results-search-section {
+      padding-inline: 24px;
+
+      .search-section-inner {
+         .body-dropdown-section {
+            .section-wrapper-desktop {
+               display: none;
+            }
+
+            .section-wrapper-tablet {
+               display: none;
+            }
+
+            .section-wrapper-tablet-small {
+               display: none;
+            }
+
+            .section-wrapper-mobile {
+               display: flex;
+            }
+         }
+      }
+   }
+}

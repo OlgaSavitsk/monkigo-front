@@ -1,0 +1,183 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+
+.guests-rooms-popup {
+   display: none;
+   position: absolute;
+   top: 25.5px;
+   left: 0;
+   width: 220px;
+   border-radius: 12px;
+   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.07), 0px 12px 24px -350px rgba(0, 0, 0, 0.1);
+   background: #fff;
+   padding: 20px 24px;
+   z-index: 2;
+   user-select: none;
+   transition: all 250ms ease;
+
+   .dropdown-list {
+
+      .list-item {
+         width: 100%;
+         list-style: none;
+         cursor: pointer;
+         color: rgba(117, 117, 117, 1);
+         transition: all 250ms ease;
+         padding-block: 24px;
+         border-bottom: 1px solid rgba(227, 227, 227, 1);
+
+         &:first-child {
+            padding-top: 0;
+         }
+
+         &:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+         }
+
+         .item-wrapper {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .item-content {
+               display: flex;
+               flex-direction: column;
+
+               .title {
+                  font-size: 14px;
+                  font-family: $medium;
+                  line-height: 17.5px;
+                  color: #131313;
+                  margin-bottom: 2px;
+               }
+
+               .description {
+                  font-size: 12px;
+                  font-family: $medium;
+                  line-height: 15px;
+                  color: rgba(117, 117, 117, 1);
+               }
+            }
+
+            .item-counter {
+               display: flex;
+               align-items: center;
+
+               button {
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50px;
+                  background: rgba(232, 242, 255, 1);
+                  border: 0;
+                  color: #131313;
+                  font-size: 12px;
+                  font-family: $medium;
+                  line-height: 15px;
+                  outline: none;
+                  transition: all 250ms ease;
+                  cursor: pointer;
+
+                  &:disabled {
+                     background: rgba(245, 247, 249, 1);
+                  }
+               }
+
+               .count-text {
+                  font-size: 12px;
+                  font-family: $medium;
+                  line-height: 15px;
+                  color: #131313;
+                  margin-inline: 10px;
+               }
+            }
+         }
+
+         .child-age-wrapper {
+
+            .child-age-inner {
+               margin-top: 12px;
+
+               &:first-child {
+                  margin-top: 24px;
+               }
+
+               .title {
+                  font-size: 12px;
+                  font-family: $medium;
+                  color: rgba(177, 177, 177, 1);
+               }
+
+               .counter-wrapper {
+                  width: 100%;
+                  padding: 18.5px 25px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  border-radius: 10px;
+                  border: 1px solid rgba(227, 227, 227, 1);
+                  margin-top: 8px;
+
+                  span {
+                     color: #131313;
+                     font-size: 14px;
+                     font-family: $semiBold;
+                  }
+
+                  input {
+                     color: #131313;
+                     font-size: 14px;
+                     font-family: $medium;
+                     border: 0;
+                     width: 15px;
+                     text-align: center;
+                     outline: none;
+                  }
+
+                  /* Chrome, Safari, Edge, Opera */
+                  input::-webkit-outer-spin-button,
+                  input::-webkit-inner-spin-button {
+                     -webkit-appearance: none;
+                     margin: 0;
+                  }
+
+                  /* Firefox */
+                  input[type=number] {
+                     -moz-appearance: textfield;
+                  }
+
+                  button {
+                     background: transparent;
+                     border: 0;
+                     color: rgba(117, 117, 117, 1);
+                     font-size: 12px;
+                     font-family: $medium;
+                     line-height: 15px;
+                     outline: none;
+                     transition: all 250ms ease;
+                     cursor: pointer;
+
+                     &:disabled {
+                        background: rgba(245, 247, 249, 1);
+                        cursor: no-drop;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+@media screen and (max-width: 630px) {
+   .guests-rooms-dropdown {
+      left: 60%;
+   }
+}

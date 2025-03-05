@@ -1,0 +1,96 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+$white: #fff;
+$white-95p: rgba(255, 255, 255, 0.95);
+$primary-25: #E9EDFC;
+$primary-50: #C9D3F7;
+
+.main-container {
+   .text-wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background: #F5F7F9;
+
+      .text-wrapper-inner {
+         width: 800px;
+         padding: 40px 0;
+
+         .back-button-wrapper {
+            width: 100%;
+            margin-bottom: 40px;
+   
+            a {
+               text-decoration: none;
+            }
+   
+            button {
+               padding: 12px 24px;
+               border-radius: 6px;
+               background: #ECEEF0;
+               border: 0;
+               font-size: 16px;
+               line-height: 20px;
+               color: $black-500;
+               font-family: $medium;
+               cursor: pointer;
+               transition: all 250ms ease;
+               display: flex;
+               align-items: center;
+   
+               img {
+                  margin-right: 8px;
+               }
+   
+               &:active {
+                  transform: scale(0.98);
+               }
+   
+               &:hover {
+                  background: #E5E5E5;
+               }
+            }
+         }
+
+         h2 {
+            font-size: 23.04px;
+            line-height: 28.8px;
+            font-family: $semiBold;
+            color: $black-500;
+            margin-bottom: 24px;
+         }
+
+         p {
+            font-family: $medium;
+            font-size: 16px;
+            line-height: 25px;
+            color: $black-500;
+         }
+      }
+   }
+}
+
+@media screen and (max-width: 849px) {
+   .main-container {
+      .text-wrapper {
+
+         .text-wrapper-inner {
+            width: 100%;
+            padding: 40px 24px;
+
+            .back-button-wrapper {
+               margin-bottom: 24px;
+            }
+         }
+      }
+   }
+}

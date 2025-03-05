@@ -1,0 +1,647 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+$white: #fff;
+$white-95p: rgba(255, 255, 255, 0.95);
+$primary-25: #E9EDFC;
+$primary-50: #C9D3F7;
+
+
+textarea{
+   height: 44px;
+   min-height: 44px;
+   max-height: 60px;
+   resize: none;
+}
+
+.section-banner {
+   width: 100% !important;
+
+   img {
+      width: 1296px;
+   }
+}
+
+.transfer-details-pick-up-time-input:hover {
+   border-color: #e5e5e5 !important;
+}
+
+.transfer-pick-up-time {
+   .transfer-time-popup {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      width: 100%;
+      height: 75px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25), 0px 12px 24px -350px rgba(0, 0, 0, 0.25);
+      z-index: 2;
+      background: #fff;
+      transition: all 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .pick-up-text {
+         font-size: 14px;
+         line-height: 17.5px;
+         font-family: $medium;
+         min-width: 90px;
+      }
+
+      .time-select-wrapper {
+         display: flex;
+         align-items: center;
+
+         .hour, .minute {
+            position: relative;
+            margin-right: 12px;
+            
+            .field-icon {
+               right: 6px;
+            }
+         }
+
+         button {
+            padding: 12px 16px;
+            height: 46px;
+            font-size: 14px;
+            line-height: 17.5px;
+            font-family: $medium;
+         }
+      }
+   }
+
+   .transfer-time-popup_active {
+      opacity: 1;
+      visibility: visible;
+      transition-delay: 0;
+   }
+}
+
+.chat-messenger__content__action {
+   .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+
+      button {
+         padding: 8px 2px;
+      }
+   }
+}
+
+.modal-layout__body {
+
+   .MuiInputAdornment-root {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100% !important;
+      max-height: 100% !important;
+
+      button {
+         width: 100%;
+         height: 100%;
+         background: transparent !important;
+
+         &:hover {
+            background: transparent;
+         }
+
+         svg {
+            display: none;
+         }
+
+         .MuiTouchRipple-root {
+            display: none !important;
+         }
+      }
+   }
+
+   .MuiDateRangePickerInput-root {
+      flex-direction: column;
+   }
+
+   .MuiPickersPopper-root {
+      color: $black-500;
+      border-radius: 12px;
+      // top: 8px !important;
+      box-shadow: 0px 4px 20px rgb(0 0 0 / 7%), 0px 12px 24px -350px rgb(0 0 0 / 10%) !important;
+
+      .MuiPaper-root {
+         box-shadow: none !important;
+      }
+
+      .MuiPickersDay-root {
+         font-family: $medium !important;
+      }
+
+      .MuiDayPicker-weekDayLabel {
+         font-family: $regular !important;
+      }
+
+      .MuiPickersCalendarHeader-label {
+         font-family: $medium;
+      }
+
+   }
+
+
+   .MuiPickersPopper-root {
+      color: $black-500;
+      border-radius: 12px;
+      // box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.07), 0px 12px 24px -350px rgba(0, 0, 0, 0.1);
+
+      .MuiPaper-root {
+         box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.07), 0px 12px 24px -350px rgba(0, 0, 0, 0.1) !important;
+      }
+
+      .MuiDateRangePickerViewDesktop-container {
+         border-right: 0.5px solid #e5e5e5 !important;
+
+         &:last-child {
+            border-right: 0 !important;
+         }
+      }
+
+      .MuiSvgIcon-root {
+         path {
+            fill: $black-500 !important;
+         }
+      }
+
+      .Mui-disabled {
+         svg {
+            path {
+               fill: #e5e5e5 !important;
+            }
+         }
+      }
+
+      .MuiTypography-subtitle1 {
+         font-family: $medium;
+      }
+
+      .MuiDayPicker-weekDayLabel {
+         font-size: 10px;
+         color: #B1B1B1;
+         font-family: $regular;
+      }
+
+      .MuiDateRangePickerDay-day {
+         font-family: $medium;
+
+         &:hover {
+            border: 1px solid #e5e5e5 !important;
+            background-color: #F4F6FE !important;
+            color: $black-500 !important;
+         }
+      }
+
+      .Mui-selected {
+         background-color: $primary-600 !important;
+
+         &:hover {
+            background-color: $primary-600 !important;
+            color: $white !important;
+         }
+      }
+
+      .MuiDateRangePickerDay-rangeIntervalDayHighlight {
+         background-color: #F4F6FE !important;
+      }
+
+      .MuiPickersDay-today {
+         border: 1px solid #e5e5e5 !important;
+      }
+   }
+
+
+   //////CALENDAR MOBILE
+   .MuiDialog-container {
+      color: $black-500;
+      border-radius: 12px;
+      // box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.07), 0px 12px 24px -350px rgba(0, 0, 0, 0.1);
+
+      .MuiPaper-root {
+         box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.07), 0px 12px 24px -350px rgba(0, 0, 0, 0.1) !important;
+      }
+
+      .MuiDateRangePickerViewDesktop-container {
+         border-right: 0.5px solid #e5e5e5 !important;
+
+         &:last-child {
+            border-right: 0 !important;
+         }
+      }
+
+      .MuiSvgIcon-root {
+         path {
+            fill: $black-500 !important;
+         }
+      }
+
+      .Mui-disabled {
+         svg {
+            path {
+               fill: #e5e5e5 !important;
+            }
+         }
+      }
+
+      .MuiPickersCalendarHeader-labelContainer {
+         font-family: $medium;
+      }
+
+      .MuiDayPicker-weekDayLabel {
+         font-size: 10px;
+         color: #B1B1B1;
+         font-family: $regular;
+      }
+
+      .MuiDateRangePickerDay-day {
+         font-family: $medium;
+
+         &:hover {
+            border: 1px solid #e5e5e5 !important;
+         }
+      }
+
+      .Mui-selected {
+         background-color: $primary-600 !important;
+      }
+
+      .MuiDateRangePickerDay-rangeIntervalDayHighlight {
+         background-color: #F4F6FE !important;
+      }
+
+      .MuiPickersDay-today {
+         border: 1px solid #e5e5e5 !important;
+      }
+
+      .MuiButton-textPrimary {
+         font-family: $medium;
+         color: $primary-600;
+      }
+   }
+
+   .add-passenger-day-of-birth::-webkit-inner-spin-button,
+   .add-passenger-day-of-birth::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      margin: 0;
+   }
+
+   .radio-list__item__control {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .radio-list__item__control_circle {
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         width: 10px;
+         height: 10px;
+         border-radius: 50%;
+         background: transparent;
+      }
+   }
+
+   //////PHONE NUMBER
+   .PhoneInput {
+      width: 100% !important;
+      display: flex !important;
+   }
+
+   .PhoneInputCountry {
+      margin-right: 12px !important;
+
+      select {
+         -webkit-appearance: none;
+         -moz-appearance: none;
+         appearance: none;
+         outline: none !important;
+      }
+
+      select::-ms-expand {
+         display: none !important;
+      }
+
+      .PhoneInputCountryIcon {
+         width: 24px;
+         height: 19.2px;
+         box-shadow: none;
+         border-radius: 4px;
+         overflow: hidden;
+         background-color: transparent;
+      }
+
+      .PhoneInputCountrySelectArrow {
+         display: none;
+      }
+
+   }
+
+   .PhoneInputInput {
+      border: 0 !important;
+      background: transparent !important;
+      outline: none;
+      font-size: 14px;
+      line-height: 17.5px;
+      color: $black-500;
+      font-weight: 500;
+
+      ::placeholder {
+         font-weight: 400;
+      }
+   }
+}
+
+.gallery-main {
+   border-radius: 8px;
+   position: relative;
+
+   .swiper-button-prev {
+      left: 0;
+      width: 55px;
+      height: 55px;
+      background: #F4F6FE;
+      box-shadow: 5px 5px 54px rgba(47, 128, 237, 0.07);
+      border-radius: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &::after {
+         content: url('../../assets/hotel-page/gallery-arrow-left.svg');
+         height: 10px;
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         font-size: 10px !important;
+      }
+
+      &:hover {
+         background: $primary-600;
+
+         &::after {
+            content: url('../../assets/hotel-page/gallery-arrow-left-white.svg');
+         }
+      }
+   }
+
+   .swiper-button-next {
+      right: 0;
+      width: 55px;
+      height: 55px;
+      background: #F4F6FE;
+      box-shadow: 5px 5px 54px rgba(47, 128, 237, 0.07);
+      border-radius: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &::after {
+         content: url('../../assets/hotel-page/gallery-arrow-right.svg');
+         height: 10px;
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         font-size: 10px !important;
+      }
+
+      &:hover {
+         background: $primary-600;
+
+         &::after {
+            content: url('../../assets/hotel-page/gallery-arrow-right-white.svg');
+         }
+      }
+   }
+
+   .swiper {
+      max-width: 500px;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      position: static;
+
+      .swiper-pagination {
+         bottom: 53px;
+      }
+
+      .swiper-pagination-bullet {
+         background: $surface-500;
+         opacity: 1;
+      }
+
+      .swiper-pagination-bullet-active {
+         background: $white;
+      }
+
+      .hotel-image {
+         width: 100%;
+         height: 100%;
+         background-position: center !important;
+         background-repeat: no-repeat !important;
+         background-size: cover !important;
+         object-fit: contain !important;
+         border-radius: 8px;
+      }
+   }
+}
+
+#modal-gallery {
+   padding: 0 24px;
+}
+
+.budget-hotel-modal-container {
+   max-width: 722px;
+   width: 100% !important;
+   height: 546px;
+
+   .swiper-fraction {
+      margin: 32px 0 0;
+   }
+
+   .modal-layout__header {
+      padding-bottom: 32px;
+   }
+
+   .modal-layout__body {
+      height: 351px;
+
+      .gallery-wrapper {
+         height: 245px;
+         margin-top: 32px;
+
+         .gallery-main {
+            height: 100%;
+         }
+      }
+   }
+}
+
+.gallery-thumbnail {
+   border-radius: 8px;
+   height: 117px;
+
+   .image-counter-area {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      // margin-bottom: 32px;
+
+      span {
+         font-size: 12px;
+         line-height: 15px;
+         color: #101010;
+         font-weight: 400;
+      }
+   }
+
+   .swiper {
+      width: 100%;
+      height: 70px;
+      display: flex;
+      justify-content: center;
+      position: static;
+      border-radius: 8px;
+      margin-top: 32px;
+
+
+      .swiper-wrapper {
+         width: 100%;
+
+         .swiper-slide {
+            max-width: 64.2px important;
+            width: 100%;
+
+            .hotel-image {
+               width: 100%;
+               height: 100%;
+               cursor: pointer;
+               background-position: center !important;
+               background-repeat: no-repeat !important;
+               background-size: cover !important;
+               object-fit: contain !important;
+               overflow: hidden;
+               border-radius: 8px;
+            }
+         }
+      }
+   }
+}
+
+@media screen and (max-width: 503px) {
+   #modal-gallery {
+      padding: 0;
+
+      .budget-hotel-modal-container {
+         height: 100%;
+         border-radius: 0;
+         background: #101010;
+         position: relative;
+         padding: 29px 24px;
+
+         .swiper-button-prev {
+            display: none;
+         }
+
+         .swiper-button-next {
+            display: none;
+         }
+
+         .modal-layout__header {
+            border: 0;
+         }
+
+         .swiper-fraction {
+            display: none;
+         }
+
+         .gallery-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 100%;
+            margin-top: 0;
+            border-radius: 0;
+
+            .gallery-main {
+               height: 200px;
+               border-radius: 0;
+
+               .swiper {
+                  border-radius: 0;
+
+                  .hotel-image {
+                     border-radius: 0;
+                  }
+               }
+            }
+         }
+
+         .gallery-thumbnail {
+            position: absolute;
+            bottom: 57px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 77px;
+
+            .image-counter-area {
+               span {
+                  color: #fff;
+               }
+            }
+
+            .swiper {
+               height: 50px;
+            }
+         }
+      }
+   }
+}
+
+@media screen and (max-width: 426px) {
+   .chat-messenger__content__action {
+      .btn-group {
+
+         button {
+            height: 100%;
+         }
+      }
+   }
+}
+
+.transfer-pick-up-date {
+   .MuiInputAdornment-root {
+      margin-left: 0 !important;
+      width: 100% !important;
+      height: 50px !important;
+      top: calc(100% - 50px);
+
+      button {
+         width: 100%;
+         padding: 0 !important;
+      }
+   }
+}

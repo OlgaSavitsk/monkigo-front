@@ -1,0 +1,276 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+$white: #fff;
+$white-95p: rgba(255, 255, 255, 0.95);
+$primary-25: #E9EDFC;
+$primary-50: #C9D3F7;
+
+.payment-status-section {
+   width: 100%;
+   min-height: 100vh;
+   height: 100vh;
+
+   .payment-status-body-wrapper {
+      width: 100%;
+      min-height: calc(100% - 140px);
+      background: #F5F7F9;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 0;
+
+      .body-wrapper-inner {
+         display: flex;
+         align-items: center;
+
+         .payment-text-area {
+            width: 327px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            margin-right: 120px;
+
+            img {
+               width: 327px;
+               margin-bottom: 48px;
+            }
+
+            .text-area-inner {
+               width: 100%;
+               display: flex;
+               flex-direction: column;
+               align-items: flex-start;
+               justify-content: flex-start;
+               margin-bottom: 32px;
+
+               h3 {
+                  font-size: 23.04px;
+                  line-height: 29px;
+                  color: $black-500;
+                  font-family: $semiBold;
+                  margin-bottom: 16px;
+               }
+
+               span {
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  color: #B1B1B1;
+                  font-family: $medium;
+               }
+
+               a {
+                  margin-top: 16px;
+                  text-decoration: none;
+                  color: $primary-600;
+                  font-size: 16px;
+                  line-height: 20px;
+                  font-family: $medium;
+               }
+            }
+
+            button {
+               width: 100%;
+               height: 52px;
+               border-radius: 12px;
+               background: $primary-600;
+               border: 0;
+               outline: none;
+               cursor: pointer;
+               color: #fff;
+               font-size: 16px;
+               line-height: 20px;
+               font-family: $medium;
+               transition: all 250ms ease;
+
+               &:hover {
+                  background: $primary-700;
+               }
+
+               &:active {
+                  transform: scale(0.95);
+               }
+            }
+         }
+
+         .payment-info-area {
+            width: 383px;
+            padding: 20px;
+            background: $white;
+            border-radius: 16px;
+
+            .tour-image {
+               width: 100%;
+               height: 220px;
+               border-radius: 10px;
+               background-position: center !important;
+               background-repeat: no-repeat !important;
+               background-size: cover !important;
+               object-fit: contain !important;
+               margin-bottom: 20px;
+            }
+
+            .tour-header-name {
+               margin-bottom: 20px;
+
+               h3 {
+                  font-size: 19.2px;
+                  line-height: 24px;
+                  color: $black-500;
+                  font-family: $semiBold;
+                  margin-bottom: 6px;
+               }
+
+               span {
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  color: #979797;
+                  font-family: $regular;
+               }
+            }
+
+            .date-wrapper {
+               width: 100%;
+               padding: 16px;
+               border-radius: 8px;
+               background: #F5F7F9;
+               margin-bottom: 20px;
+
+               .check-in,
+               .check-out {
+                  width: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+
+                  span {
+                     font-size: 14px;
+                     line-height: 17.5px;
+                     color: #757575;
+                     font-family: $medium;
+                  }
+
+                  h3 {
+                     font-size: 14px;
+                     line-height: 17.5px;
+                     color: $black-500;
+                     font-family: $semiBold;
+                  }
+               }
+
+               .check-in {
+                  margin-bottom: 16px;
+               }
+            }
+
+            .reservation-code-area {
+               width: 100%;
+               display: flex;
+               align-items: center;
+               justify-content: space-between;
+               padding-top: 20px;
+               border-top: 0.3px solid #E5E5E5;
+
+               span {
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  color: $black-500;
+                  font-family: $medium;
+               }
+            }
+         }
+      }
+   }
+}
+
+@media screen and (max-width: 1155px) {
+   .payment-status-section {
+      .payment-status-body-wrapper {
+         .body-wrapper-inner {
+            .payment-text-area {
+               width: 333px;
+               margin-right: 40px;
+
+               img {
+                  width: 244.08px;
+               }
+            }
+
+            .payment-info-area {
+               width: 349px;
+            }
+         }
+      }
+   }
+}
+
+@media screen and (max-width: 849px) {
+   .payment-status-section {
+      .payment-status-body-wrapper {
+         .body-wrapper-inner {
+            flex-direction: column;
+
+            .payment-text-area {
+               width: 425px;
+               margin-right: 0;
+               margin-bottom: 32px;
+            }
+
+            .payment-info-area {
+               width: 425px;
+               padding: 16px;
+
+               .tour-image {
+                  display: none;
+               }
+
+               .tour-header-name {
+                  margin-bottom: 32px;
+               }
+
+               .date-wrapper {
+                  margin-bottom: 32px;
+               }
+
+               .reservation-code-area {
+                  padding-top: 32px;
+               }
+            }
+         }
+      }
+   }
+}
+
+@media screen and (max-width: 539px) {
+   .payment-status-section {
+      .payment-status-body-wrapper {
+         min-height: calc(100% - 113.95px);
+      }
+   }
+}
+
+@media screen and (max-width: 504px) {
+   .payment-status-section {
+      .payment-status-body-wrapper {
+         padding: 32px 24px;
+
+         .body-wrapper-inner {
+
+            .payment-text-area {
+               width: 100%;
+            }
+
+            .payment-info-area {
+               width: 100%;
+            }
+         }
+      }
+   }
+}

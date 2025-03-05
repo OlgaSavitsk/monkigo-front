@@ -1,0 +1,184 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+
+// /////////////////////////////////////CITIZENSHIP DROPDOWN////////////////////////////////////
+// .citizenship-dropdown {
+//    display: none;
+//    position: absolute;
+//    top: 60px;
+//    left: 50%;
+//    transform: translateX(-50%);
+//    width: 152.26px;
+//    border-radius: 12px;
+//    box-shadow: 0px -5px 30px rgba(125, 125, 125, 0.1);
+//    background: #fff;
+//    padding-top: 22px;
+//    padding-bottom: 22px;
+//    z-index: 2;
+//    user-select: none;
+//    transition: all 250ms ease;
+
+//    .popup-arrow-layer {
+//       height: 13px;
+//       width: 30px;
+//       position: absolute;
+//       top: -10px;
+//       left: 50%;
+//       transform: translate(-50%);
+//       display: flex;
+//       align-items: flex-end;
+//       justify-content: center;
+
+//       .popup-arrow {
+//          width: 30px;
+//          height: 13px;
+//          background-image: url('../../../assets/popup-arrow/popup-arrow-white.png');
+//          background-position: center;
+//          background-repeat: no-repeat;
+//          background-size: contain;
+//       }
+//    }
+
+//    .dropdown-list {
+
+//       .list-item {
+//          width: 100%;
+//          list-style: none;
+//          font-size: 14px;
+//          font-family: $medium;
+//          line-height: 17.5px;
+//          padding: 0 17px;
+//          padding-block: 10px;
+//          display: flex;
+//          align-items: center;
+//          cursor: pointer;
+//          color: rgba(117, 117, 117, 1);
+//          transition: all 250ms ease;
+
+//          &:hover {
+//             background: rgba(245, 247, 249, 1);
+//          }
+
+//          &:hover {
+//             color: #131313 !important;
+//          }
+
+//          &:first-child {
+//             padding-top: 10px;
+//          }
+
+//          img {
+//             margin-right: 10px;
+//             margin-left: 0 !important;
+//          }
+
+//          &:last-child {
+//             padding-top: 10px;
+//             padding-bottom: 10px;
+//          }
+//       }
+//    }
+// }
+
+// /////////////////////////////GOING TO DROPDOWN//////////////////////////////////////
+// .going-to-dropdown {
+//    display: none;
+//    position: absolute;
+//    top: 60px;
+//    left: 50%;
+//    transform: translateX(-50%);
+//    width: 270.65px;
+//    border-radius: 12px;
+//    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.07), 0px 12px 24px -350px rgba(0, 0, 0, 0.1);
+//    background: #fff;
+//    padding: 24px 0 0;
+//    z-index: 2;
+//    user-select: none;
+//    transition: all 250ms ease;
+
+//    .popup-arrow-layer {
+//       height: 13px;
+//       width: 30px;
+//       position: absolute;
+//       top: -10px;
+//       left: 50%;
+//       transform: translate(-50%);
+//       display: flex;
+//       align-items: flex-end;
+//       justify-content: center;
+
+//       .popup-arrow {
+//          width: 30px;
+//          height: 13px;
+//          background-image: url('../../../assets/popup-arrow/popup-arrow-white.png');
+//          background-position: center;
+//          background-repeat: no-repeat;
+//          background-size: contain;
+//       }
+//    }
+
+//    .dropdown-list {
+//       width: 100%;
+
+//       .list-title {
+//          margin-bottom: 10px;
+//          padding: 0 24px;
+
+//          span {
+//             font-size: 12px;
+//             font-family: $medium;
+//             line-height: 15px;
+//             color: rgba(133, 133, 133, 1);
+//          }
+//       }
+
+//       .list-item-wrapper {
+//          width: 100%;
+//          margin-bottom: 14px;
+
+//          &:last-child {
+//             margin-bottom: 0;
+//          }
+
+//          .list-item {
+//             width: 100%;
+//             list-style: none;
+//             margin-right: 0 !important;
+//             padding: 0 24px;
+//             padding-block: 10px;
+//             display: flex;
+//             align-items: center;
+//             cursor: pointer;
+//             transition: all 250ms ease;
+
+//             &:last-child {
+//                margin-bottom: 14px;
+//             }
+
+//             &:hover {
+//                background: rgba(245, 247, 249, 1);
+//             }
+
+//             span {
+//                font-size: 16px;
+//                font-family: $medium;
+//                line-height: 20px;
+//                color: rgba(44, 44, 44, 1);
+//             }
+
+//             img {
+//                width: 14.65px;
+//                margin-right: 10px;
+//                margin-left: 0 !important;
+//             }
+//          }
+//       }
+//    }
+// }

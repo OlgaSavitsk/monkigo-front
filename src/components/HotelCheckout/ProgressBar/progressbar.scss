@@ -1,0 +1,333 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+$white: #fff;
+$white-95p: rgba(255, 255, 255, 0.95);
+$primary-25: #E9EDFC;
+$primary-50: #C9D3F7;
+
+.progressBar-wrapper {
+   width: 100%;
+   margin-bottom: 40px;
+   padding-top: 40px;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+
+   .progressBar-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99;
+      cursor: pointer;
+
+      .progressBar-modal-inner {
+         width: 425px;
+         padding: 32px 24px;
+         background: #fff;
+         border-radius: 20px;
+         cursor: auto;
+         transition: all 250ms ease;
+
+         .progressBar-info-wrapper {
+            display: flex;
+            margin-bottom: 32px;
+
+            .circle-area {
+               width: 32px;
+               height: 160px;
+               display: flex;
+               flex-direction: column;
+               justify-content: space-between;
+               align-items: center;
+               margin-right: 12px;
+
+               .top-circle {
+                  width: 32px;
+                  min-height: 32px;
+                  border-radius: 31px;
+                  background: $primary-600;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  position: relative;
+               }
+
+               .line {
+                  width: 2px;
+                  height: 100%;
+                  background: $primary-600;
+               }
+
+               .line-2 {
+                  background: #E5E5E5;
+               }
+
+               .middle-circle {
+                  width: 32px;
+                  min-height: 32px;
+                  border-radius: 31px;
+                  border: 8px solid #fff;
+                  background: $primary-600;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  position: relative;
+               }
+
+               .bottom-circle {
+                  width: 32px;
+                  min-height: 32px;
+                  border-radius: 31px;
+                  border: 2px solid #E5E5E5;
+                  background: transparent;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  position: relative;
+               }
+            }
+
+            .text-area {
+               width: 100%;
+               height: 160px;
+               display: flex;
+               flex-direction: column;
+               justify-content: space-between;
+
+               span:nth-child(1),
+               span:nth-child(2),
+               span:nth-child(3) {
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  color: #757575;
+                  font-family: $medium;
+                  height: 32px;
+                  display: flex;
+                  align-items: center;
+               }
+
+               span:nth-child(2) {
+                  color: $black-500;
+               }
+            }
+         }
+
+         button {
+            width: 100%;
+            height: 46px;
+            border-radius: 10px;
+            border: 0;
+            background: #F5F7F9;
+            color: $black-500;
+            font-size: 14px;
+            line-height: 17.5px;
+            font-family: $medium;
+            cursor: pointer;
+            outline: none;
+            transition: all 250ms ease;
+
+            &:active {
+               transform: scale(0.95);
+            }
+         }
+
+      }
+   }
+
+   .progressBar-wrapper-inner {
+      width: 1248px;
+      height: 68px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+
+      .left-circle {
+         min-width: 32px;
+         height: 32px;
+         border-radius: 31px;
+         background: $primary-600;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         position: relative;
+         cursor: pointer;
+
+         &::after {
+            content: 'Search';
+            position: absolute;
+            bottom: -36px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 46px;
+            font-size: 14px;
+            line-height: 17.5px;
+            color: #757575;
+            font-family: $medium;
+         }
+      }
+
+      .line {
+         width: 100%;
+         height: 2px;
+         margin-top: 15px;
+         background: $primary-600;
+      }
+
+      .line-2 {
+         background: #E5E5E5;
+      }
+
+      .middle-circle {
+         min-width: 32px;
+         height: 32px;
+         border-radius: 31px;
+         border: 8px solid #F5F7F9;
+         background: $primary-600;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         position: relative;
+
+         &::after {
+            content: 'Guest details';
+            position: absolute;
+            bottom: -44px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 87px;
+            font-size: 14px;
+            line-height: 17.5px;
+            color: $black-500;
+            font-family: $medium;
+         }
+      }
+
+      .right-circle {
+         min-width: 32px;
+         height: 32px;
+         border-radius: 31px;
+         border: 2px solid #E5E5E5;
+         background: transparent;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         position: relative;
+
+         &::after {
+            content: 'Payment';
+            position: absolute;
+            bottom: -38px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 59px;
+            font-size: 14px;
+            line-height: 17.5px;
+            color: #757575;
+            font-family: $medium;
+         }
+      }
+   }
+
+   .progressBar-wrapper-inner-responsive {
+      width: 100%;
+      height: 50px;
+      display: none;
+      padding: 16px;
+      background: #fff;
+      border-radius: 10px;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 250ms ease;
+      user-select: none;
+
+      &:active {
+         transform: scale(0.98);
+      }
+
+      .text-wrapper {
+         display: flex;
+         align-items: center;
+
+         span {
+            font-size: 14px;
+            line-height: 18px;
+            margin-right: 16px;
+            color: #15329E;
+            font-family: $medium;
+         }
+
+         h3 {
+            font-size: 14px;
+            line-height: 18px;
+            margin-right: 16px;
+            color: $black-500;
+            font-family: $medium;
+         }
+      }
+   }
+}
+
+/////Breakpoint: 1440px down
+@media screen and (max-width: 1440px) {
+   .progressBar-wrapper {
+      padding: 40px 96px 0;
+
+      .progressBar-wrapper-inner {
+         width: 100%;
+      }
+   }
+}
+
+/////Breakpoint: 1155px down
+@media screen and (max-width: 1155px) {
+   .progressBar-wrapper {
+      padding: 48px 64px 0;
+   }
+}
+
+/////Breakpoint: 849px down
+@media screen and (max-width: 849px) {
+   .progressBar-wrapper {
+      padding: 24px 40px 0;
+      margin-bottom: 24px;
+
+      .progressBar-wrapper-inner {
+         display: none;
+      }
+
+      .progressBar-wrapper-inner-responsive {
+         display: flex;
+      }
+   }
+}
+
+/////Breakpoint: 504px down
+@media screen and (max-width: 504px) {
+   .progressBar-wrapper {
+      padding: 24px 24px 0;
+
+      .progressBar-modal {
+         align-items: flex-end;
+
+         .progressBar-modal-inner {
+            width: 100%;
+            border-radius: 20px 20px 0 0;
+         }
+      }
+   }
+}

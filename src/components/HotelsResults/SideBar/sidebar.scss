@@ -1,0 +1,408 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+$white: #fff;
+$white-95p: rgba(255, 255, 255, 0.95);
+$primary-25: #E9EDFC;
+$primary-50: #C9D3F7;
+
+.hotels-results-sidebar {
+   // max-width: 288px;
+   // width: 100%;
+   display: flex;
+   flex-direction: column;
+   flex: 0.5;
+   padding: 24px 24px 32px;
+   border-radius: 16px;
+   background: $white;
+   margin-right: 32px;
+
+   .reset-filter-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 32px;
+      background: $white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0;
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: $primary-600;
+      cursor: pointer;
+
+      &:hover {
+         background: $primary-700;
+      }
+
+      svg {
+         width: 9px;
+         height: 9px;
+
+         path {
+            fill: $white;
+         }
+      }
+   }
+
+   .locations-area {
+      width: 100%;
+      margin-bottom: 32px;
+
+      h3 {
+         font-size: 19.2px;
+         line-height: 24px;
+         font-family: $medium;
+         color: $black-500;
+         margin-bottom: 24px;
+      }
+
+      .locations-inner {
+         position: relative;
+         width: 100%;
+         height: 100%;
+         cursor: pointer;
+         user-select: none;
+         border-radius: 16px;
+
+         img {
+            border-radius: 16px;
+            pointer-events: none;
+            max-width: 240px;
+            width: 100%;
+         }
+
+         button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            width: 159px;
+            height: 44px;
+            border-radius: 10px;
+            bordeR: 0;
+            background: $primary-600;
+            transition: all 250ms ease;
+            font-size: 16px;
+            line-height: 20px;
+            color: $white;
+            font-family: $medium;
+
+            &:hover {
+               background: $primary-700;
+            }
+         }
+      }
+   }
+
+   .sidebar-filters {
+      width: 100%;
+
+      .filters-header {
+         width: 100%;
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         cursor: pointer;
+
+         h3 {
+            font-size: 19.2px;
+            line-height: 24px;
+            font-family: $medium;
+            color: $black-500;
+         }
+
+         img {
+            pointer-events: none;
+            user-select: none;
+         }
+      }
+
+      .filters-body {
+         padding-top: 24px;
+
+         .price-area {
+            width: 100%;
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+            border-bottom: 0.5px solid #e5e5e5;
+            display: flex;
+            flex-direction: column;
+
+            h3 {
+               font-size: 16px;
+               line-height: 20px;
+               font-family: $medium;
+               color: $black-500;
+               margin-bottom: 48px;
+            }
+
+            // span {
+            //    font-size: 12px;
+            //    line-height: 15px;
+            //    font-family: $medium;
+            //    color: $primary-600;
+            // }
+
+            .MuiSlider-rail {
+               background: $surface-500 !important;
+               width: calc(100% + 22px) !important;
+               transform: translate(-11px, -2px) !important;
+            }
+
+            .MuiSlider-root {
+               margin-top: 12px !important;
+               padding-top: 5px !important;
+               width: calc(100% - 22px) !important;
+               align-self: center !important;
+
+               span {
+                  color: $primary-600;
+               }
+
+               .MuiSlider-thumb {
+                  width: 22px !important;
+                  height: 22px !important;
+   
+                  .MuiSlider-valueLabel {
+                     background: transparent !important;
+                     transform: translateY(-100%) scale(1) !important;
+                     color: $primary-600 !important;
+   
+                     span {
+                        font-size: 14px !important;
+                        font-family: $medium !important;
+                     }
+   
+                  }
+   
+                  .css-3besu {
+                     transform: translateY(-100%), scale(1) !important;
+                  }
+               }
+            }
+
+            .css-eg0mwd-MuiSlider-thumb:before {
+               box-shadow: none !important;
+            }
+         }
+
+         .star-rating-area {
+            width: 100%;
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+            border-bottom: 0.5px solid #e5e5e5;
+
+            h3 {
+               font-size: 16px;
+               line-height: 20px;
+               font-family: $medium;
+               color: $black-500;
+               margin-bottom: 25px;
+            }
+
+            .checkbox-list-wrapper {
+               width: 100%;
+
+               ul {
+                  padding: 0;
+                  margin: 0;
+
+                  li {
+                     list-style: none;
+                     display: flex;
+                     align-items: center;
+                     margin-bottom: 16px;
+
+                     &:last-child {
+                        margin-bottom: 0;
+                     }
+
+                     .checkbox {
+                        min-width: 16px;
+                        height: 16px;
+                        background-color: $primary-600;
+                        border-radius: 4px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 8px;
+                        cursor: pointer;
+                        transition: all 250ms ease;
+                     }
+
+                     img {
+                        cursor: pointer;
+                     }
+
+                     span {
+                        font-size: 12px;
+                        line-height: 15px;
+                        color: #979797;
+                        font-family: $regular;
+                        margin-left: 3px;
+                        cursor: pointer;
+                        user-select: none;
+                     }
+                  }
+               }
+            }
+         }
+
+         .review-rating-area {
+            width: 100%;
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+            border-bottom: 0.5px solid #e5e5e5;
+
+            h3 {
+               font-size: 16px;
+               line-height: 20px;
+               font-family: $medium;
+               color: $black-500;
+               margin-bottom: 25px;
+            }
+
+            .checkbox-list-wrapper {
+               width: 100%;
+
+               ul {
+                  padding: 0;
+                  margin: 0;
+
+                  li {
+                     list-style: none;
+                     display: flex;
+                     align-items: center;
+                     margin-bottom: 16px;
+
+                     &:last-child {
+                        margin-bottom: 0;
+                     }
+
+                     .checkbox {
+                        min-width: 16px;
+                        height: 16px;
+                        background-color: $primary-600;
+                        border-radius: 4px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 8px;
+                        cursor: pointer;
+                        transition: all 250ms ease;
+                     }
+
+                     img {
+                        cursor: pointer;
+                     }
+
+                     span {
+                        font-size: 14px;
+                        line-height: 18px;
+                        color: $black-500;
+                        font-family: $regular;
+                        cursor: pointer;
+                        user-select: none;
+                     }
+                  }
+               }
+            }
+         }
+
+         .hotel-name-area {
+            width: 100%;
+
+            h3 {
+               font-size: 16px;
+               line-height: 20px;
+               font-family: $medium;
+               color: $black-500;
+               margin-bottom: 25px;
+            }
+
+            .input-area {
+               width: 100%;
+               display: flex;
+               align-items: center;
+               position: relative;
+
+               input {
+                  width: 100%;
+                  height: 60px;
+                  padding: 16px 60px 16px 25px;
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  color: $black-500;
+                  font-family: $regular;
+                  border: 1px solid #e5e5e5;
+                  border-radius: 10px;
+                  outline: none;
+               }
+
+               ::placeholder {
+                  color: $surface-500;
+                  font-family: $regular;
+               }
+
+               .dropdown-button {
+                  width: 48px;
+                  height: 48px;
+                  position: absolute;
+                  top: 50%;
+                  right: 6px;
+                  transform: translateY(-50%);
+
+                  .save-button {
+                     width: 100%;
+                     height: 48px;
+                     border: 0;
+                     background: $primary-600;
+                     border-radius: 8px;
+                     cursor: pointer;
+                     font-size: 16px;
+                     line-height: 20px;
+                     color: $white;
+                     font-family: $medium;
+                     outline: none;
+
+                     &:hover {
+                        background: $primary-700;
+                     }
+
+                     &:active {
+                        transform: scale(0.95);
+                     }
+                  }
+               }
+            }
+
+         }
+      }
+   }
+}
+
+/////Breakpoint: 1440px down
+@media screen and (max-width: 1207px) {
+   .hotels-results-sidebar {
+      display: none;
+   }
+}
+
+/////Breakpoint: 1207px down
+@media screen and (min-width: 768px) and (max-width: 1207px) {}
+
+/////Breakpoint: 767px down
+@media screen and (min-width: 540px) and (max-width: 767px) {}
+
+/////Breakpoint: 539px down
+@media screen and (min-width: 375px) and (max-width: 539px) {}

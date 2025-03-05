@@ -1,0 +1,502 @@
+$bold: Circular_Bold;
+$semiBold: Circular_SemiBold;
+$medium: Circular_Medium;
+$light: Circular_Light;
+$regular: Circular_Regular;
+$primary-600: #274DE0;
+$primary-700: #1D3EBA;
+$black-500: #101010;
+$surface-500: #B1B1B1;
+$white: #fff;
+$white-95p: rgba(255, 255, 255, 0.95);
+$primary-25: #E9EDFC;
+$primary-50: #C9D3F7;
+
+.single-tour-section {
+   width: 100%;
+
+   //////////////////SECTION BANNER
+   .section-banner {
+      width: 100%;
+      height: 320px;
+      display: flex;
+      justify-content: center;
+      padding-top: 0;
+
+      .section-banner__img {
+         width: 1248px;
+         height: 100%;
+         background-position: center;
+         background-size: cover;
+         border-radius: 20px;
+
+         img {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+         }
+      }
+   }
+
+   //////////Single tour body
+   .single-tour-body {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 0 96px;
+
+      .single-tour-body-inner {
+         width: 1248px;
+
+         /////Reserve Area
+         .single-tour-reserve-area {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+
+            .tour-name {
+               h2 {
+                  font-size: 27.65px;
+                  line-height: 34.6px;
+                  color: $black-500;
+                  font-family: $semiBold;
+               }
+            }
+
+            .reserve-button {
+               button {
+                  width: 237px;
+                  height: 52px;
+                  border-radius: 8px;
+                  background: $primary-600;
+                  border: 0;
+                  outline: none;
+                  cursor: pointer;
+                  color: #fff;
+                  font-size: 16px;
+                  line-height: 20px;
+                  font-family: $medium;
+                  transition: all 250ms ease;
+
+                  &:hover {
+                     background: $primary-700;
+                  }
+
+                  &:active {
+                     transform: scale(0.95);
+                  }
+               }
+            }
+         }
+
+         ///INFORMATION AREA
+         .single-tour-information-area {
+            width: 100%;
+            margin-bottom: 64px;
+
+            .area-header-title {
+               width: 100%;
+               padding-bottom: 12px;
+               margin-bottom: 24px;
+               border-bottom: 1.5px solid $primary-600;
+
+               span {
+                  font-size: 16px;
+                  line-height: 20px;
+                  color: $black-500;
+                  font-family: $medium;
+               }
+            }
+
+            .single-information-wrapper {
+               ul {
+
+                  li {
+                     list-style: none;
+                     font-size: 16px;
+                     line-height: 20px;
+                     color: #757575;
+                     font-family: $medium;
+                     margin-bottom: 16px;
+
+                     &:last-child {
+                        margin-bottom: 0;
+                     }
+
+                     span {
+                        color: $black-500;
+                     }
+                  }
+               }
+            }
+
+            .tour-map{
+               position: relative;
+               display: block;
+               margin-right: auto;
+               margin-left: auto;
+               width: 100%;
+            }
+         }
+
+         ///Description AREA
+         .single-tour-description-area {
+            width: 100%;
+            margin-bottom: 64px;
+
+            .area-header-title {
+               width: 100%;
+               padding-bottom: 12px;
+               margin-bottom: 24px;
+               border-bottom: 1.5px solid $primary-600;
+
+               span {
+                  font-size: 16px;
+                  line-height: 20px;
+                  color: $black-500;
+                  font-family: $medium;
+               }
+            }
+
+            p {
+               font-size: 16px;
+               line-height: 20px;
+               color: #757575;
+               font-family: $regular;
+            }
+         }
+
+         ////GALLERY AREA
+         .single-tour-gallery-area {
+            width: 100%;
+            margin-bottom: 96px;
+
+            .area-header-title {
+               width: 100%;
+               padding-bottom: 12px;
+               margin-bottom: 24px;
+               border-bottom: 1.5px solid $primary-600;
+
+               span {
+                  font-size: 16px;
+                  line-height: 20px;
+                  color: $black-500;
+                  font-family: $medium;
+               }
+            }
+
+            .gallery-wrapper {
+               width: 100%;
+               display: grid;
+               grid-template-columns: 1fr 1fr 1fr;
+               gap: 16px;
+
+               img {
+                  width: 100%;
+                  height: 200px;
+                  object-fit: cover;
+               }
+            }
+         }
+
+         /////FOOTER
+         footer {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .copyright {
+               span {
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  color: #B1B1B1;
+                  font-family: $medium;
+               }
+            }
+
+            .terms-of-use {
+               div {
+                  display: flex;
+                  align-items: center;
+                  font-size: 14px;
+                  line-height: 17.5px;
+                  color: #B1B1B1;
+                  font-family: $medium;
+
+                  span {
+                     margin-right: 2px;
+                  }
+
+                  a {
+                     color: $primary-600;
+                     text-decoration: none;
+
+                     &:hover {
+                        text-decoration: underline;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+
+
+@media screen and (min-width: 1440px) {
+  
+   .s10a778ea57b94a96b2c1e2c327c04135{
+      background-position: center -250px !important;
+   }
+   .s154b2c66a3dd47b9af2986ba4ae029d3{
+      background-position: center -290px !important;
+   }
+   .s26d62dbb53604077ae04937f8f589684{
+      background-position: center -190px !important;
+   }
+   .s308435f97a8843538634f65a14a2005b{
+      background-position: center -190px !important;
+   }
+   .s79ca9b8b134f48a2ad7cbfc9cd766073{
+      background-position: center -330px !important;
+   }
+   .s7cdf87aadf62469988fc738286443d97{
+      background-position: center -380px !important;
+   }
+   .s9fdf487478ef45308f244c01f2a15ef4{
+      background-position: center -300px !important;
+   }
+   .sc30ccba39e5c477f9f7123253f00d370{
+      background-position: center -70px !important;
+   }
+   .sc7a53eaa99f34cdda46e6d4f17d59eb3{
+      background-position: center -190px !important;
+   }
+   .sd8b18508235a4873baaf82fe993dc885{
+      background-position: center -190px !important;
+   }
+}
+
+@media screen and (max-width: 1439px) {
+   .single-tour-section {
+      .section-banner {
+         padding: 0 96px;
+
+         .section-banner__img {
+            width: 100%;
+         }
+      }
+
+      .single-tour-body {
+         padding: 40px 96px 96px;
+
+         .single-tour-body-inner {
+            width: 100%;
+         }
+      }
+   }
+   .s10a778ea57b94a96b2c1e2c327c04135{
+      background-position: center -190px !important;
+   }
+   .s154b2c66a3dd47b9af2986ba4ae029d3{
+      background-position: center -190px !important;
+   }
+   .s26d62dbb53604077ae04937f8f589684{
+      background-position: center -190px !important;
+   }
+   .s308435f97a8843538634f65a14a2005b{
+      background-position: center -190px !important;
+   }
+   .s79ca9b8b134f48a2ad7cbfc9cd766073{
+      background-position: center -230px !important;
+   }
+   .s7cdf87aadf62469988fc738286443d97{
+      background-position: center -250px !important;
+   }
+   .s9fdf487478ef45308f244c01f2a15ef4{
+      background-position: center -190px !important;
+   }
+   .sc30ccba39e5c477f9f7123253f00d370{
+      background-position: center -60px !important;
+   }
+   .sc7a53eaa99f34cdda46e6d4f17d59eb3{
+      background-position: center -130px !important;
+   }
+   .sd8b18508235a4873baaf82fe993dc885{
+      background-position: center -190px !important;
+   }
+}
+
+@media screen and (max-width: 1023px) {
+   .single-tour-section {
+      .section-banner {
+         padding: 0;
+         height: 240px;
+
+         .section-banner__img {
+            img {
+               border-radius: 0;
+            }
+         }
+      }
+
+      .single-tour-body {
+         padding: 40px 40px 64px;
+
+         .single-tour-body-inner {
+            .single-tour-gallery-area {
+               margin-bottom: 64px;
+
+               .gallery-wrapper {
+                  grid-template-columns: 1fr 1fr;
+               }
+            }
+
+            footer {
+               flex-direction: column;
+               align-items: flex-start;
+
+               .copyright {
+                  margin-bottom: 10px;
+               }
+
+               .terms-of-use {
+                  width: 100%;
+                  display: flex;
+                  align-items: flex-start;
+                  justify-content: space-between;
+
+                  div {
+                     width: 100%;
+                     display: flex;
+                     align-items: flex-start;
+                     justify-content: space-between;
+
+                     .dot {
+                        display: none;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   .s10a778ea57b94a96b2c1e2c327c04135{
+      background-position: center -190px !important;
+   }
+   .s154b2c66a3dd47b9af2986ba4ae029d3{
+      background-position: center -190px !important;
+   }
+   .s26d62dbb53604077ae04937f8f589684{
+      background-position: center -190px !important;
+   }
+   .s308435f97a8843538634f65a14a2005b{
+      background-position: center -190px !important;
+   }
+   .s79ca9b8b134f48a2ad7cbfc9cd766073{
+      background-position: center -230px !important;
+   }
+   .s7cdf87aadf62469988fc738286443d97{
+      background-position: center -240px !important;
+   }
+   .s9fdf487478ef45308f244c01f2a15ef4{
+      background-position: center -190px !important;
+   }
+   .sc30ccba39e5c477f9f7123253f00d370{
+      background-position: center -60px !important;
+   }
+   .sc7a53eaa99f34cdda46e6d4f17d59eb3{
+      background-position: center -60px !important;      
+   }
+   .sd8b18508235a4873baaf82fe993dc885{
+      background-position: center -190px !important;
+   }
+}
+
+@media screen and (max-width: 767px) {
+   .single-tour-section {
+      .section-banner {
+         padding: 0;
+         height: 180px;
+      }
+
+      .single-tour-body {
+         padding: 32px 24px 64px;
+
+         .single-tour-body-inner {
+            .single-tour-reserve-area {
+               flex-direction: column;
+               align-items: flex-start;
+
+               .tour-name {
+                  margin-bottom: 32px;
+               }
+
+               .reserve-button {
+                  width: 100%;
+
+                  button {
+                     width: 100%;
+                  }
+               }
+            }
+
+            .single-tour-gallery-area {
+               .gallery-wrapper {
+                  grid-template-columns: 1fr;
+               }
+            }
+
+            .single-tour-information-area,
+            .single-tour-description-area {
+               margin-bottom: 48px;
+            }
+
+            footer {
+               .terms-of-use {
+                  div {
+                     flex-direction: row-reverse;
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   .s10a778ea57b94a96b2c1e2c327c04135{
+      background-position: center -80px !important;
+   }
+   .s154b2c66a3dd47b9af2986ba4ae029d3{
+      background-position: center center !important;
+   }
+   .s26d62dbb53604077ae04937f8f589684{
+      background-position: center center !important;
+   }
+   .s308435f97a8843538634f65a14a2005b{
+      background-position: center center !important;
+   }
+   .s79ca9b8b134f48a2ad7cbfc9cd766073{
+      background-position: center -60px !important;
+   }
+   .s7cdf87aadf62469988fc738286443d97{
+      background-position: center center !important;
+   }
+   .s9fdf487478ef45308f244c01f2a15ef4{
+      background-position: center center !important;
+   }
+   .sc30ccba39e5c477f9f7123253f00d370{
+      background-position: center -40px !important;
+   }
+   .sc7a53eaa99f34cdda46e6d4f17d59eb3{
+      background-position: center -10px !important;
+   }
+   .sd8b18508235a4873baaf82fe993dc885{
+      background-position: center center !important;
+   }
+}
