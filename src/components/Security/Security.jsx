@@ -10,6 +10,9 @@ import OTPInput from "react-otp-input";
 import Logo from '../../assets_concierge/images/logo/logo.svg';
 import LogoIAC from '../../../src/assets/navbar-second/logo-iac2023.svg';
 import VerifiedImg from '../../assets/security/images/other/icon/verified.svg';
+import { config } from '../../config';
+
+const baseURL = config.baseURL;
 
 const Security = () => {
 
@@ -23,6 +26,9 @@ const Security = () => {
    const [passwordShow, setPasswordShow] = useState(false);
    const [passwordCorrect, setPasswordCorrect] = useState(false);
    const [signInPasswordCorrect, setSignInPasswordCorrect] = useState(false);
+   const [verificationCorrect, setVerificationCorrect] = useState(false);
+   const [isResend, setIsResend] = useState(false);
+   const [timerCount, setTimerCount] = useState(30);
    const [signInPassword, setSignInPassword] = useState('');
    const [OTP, setOTP] = useState("");
    const [signUpDetails, setSignUpDetails] = useState({
@@ -39,13 +45,6 @@ const Security = () => {
    const [token, setToken] = useState(null);
    const [signupfNameErrorContent, setSignupfNameErrorContent] = useState('');
    const [signuplNameErrorContent, setSignuplNameErrorContent] = useState('');
-
-
-   useEffect(() => {
-
-      License();
-
-   }, [])
 
    function License() {
       if (token === null) {
@@ -86,6 +85,7 @@ const Security = () => {
       setPasswordShow(false);
       setPasswordCorrect(false);
       setSignInPasswordCorrect(false);
+      setVerificationCorrect(false)
       setSignInPassword('');
       setOTP("");
       setSignUpDetails({
@@ -203,11 +203,9 @@ const Security = () => {
    /////EMAIL SUBMIT HANDLER
    const emailSubmitHandler = async (e) => {
       if (emailValidate(email)) {
-         if (localStorage.getItem('token') !== null && localStorage.getItem('token') !== undefined) {
             $.ajax({
-               method: 'GET',
-               url: 'https://monkigo.com/app/v1/user/exists',
-               data: { token: localStorage.getItem('token'), login: email },
+               method: 'POST',
+               url: `${baseURL}/app/v1/security/user-exists?email=${email}`,
                dataType: 'json',
                success: (content) => {
                   if (content.result.status === false) {
@@ -217,11 +215,6 @@ const Security = () => {
                   }
                }
             });
-         }
-         else {
-            License();
-            window.location.href = '/auth';
-         }
       }
    }
 
@@ -229,7 +222,6 @@ const Security = () => {
    const passwordSubmitHandler = (e) => {
       if (passwordCorrect === true) {
          ///////////BURDA GIRIS OLUNUR
-         if (localStorage.getItem('token') !== null || localStorage.getItem('token') !== undefined) {
             $.ajax({
                method: 'POST',
                url: 'https://monkigo.com/app/v1/user/password/change',
@@ -259,13 +251,42 @@ const Security = () => {
                error: (jqXHR) => {
                }
             });
-         }
-         else {
+      }
+   }
 
-            License();
-            window.location.href = '/auth';
-         }
-
+   const signUpHandler = () => {
+      if (passwordCorrect === true) {
+            $.ajax({
+               method: 'POST',
+               url: `${baseURL}/app/v1/security/signup`,
+               contentType: 'application/json',
+               data: JSON.stringify({
+                  email: email,
+                  password: password,
+                  firstname: signUpDetails.fName,
+                  lastname: signUpDetails.lName,
+                  birthday: '2000-06-13'
+               }),
+               dataType: 'json',
+               success: (content) => {
+                  if (content.result.status) {
+                     if (content.result.error === false) {
+                        if (content.data !== null) {
+                           localStorage.setItem('user', JSON.stringify(content.data));
+                        }
+                        setRegistrationProgress('congrats')
+                        setTimeout(() => {
+                           window.location.href = '/chat';
+                        }, 3000)
+                     }
+                  }
+                  else {
+                     window.location.href = '/auth';
+                  }
+               },
+               error: (jqXHR) => {
+               }
+            });
       }
    }
 
@@ -286,24 +307,25 @@ const Security = () => {
    ////VERIFY RESET PASSWORD HANDLE CHANGE
    const verifySubmitHandler = () => {
       $.ajax({
-         method: 'GET',
-         url: 'https://monkigo.com/app/v1/user/password/verfication/check',
-         data: { token: token, code: OTP },
+         method: 'POST',
+         url: `${baseURL}/app/v1/security/verify-otp?code=${OTP}&email=${email}`,
          dataType: 'json',
          success: (content) => {
             if (content.result.status) {
                if (verifyForgot === true) {
                   setRegistrationProgress('create-new-password');
                } else {
-                  setRegistrationProgress('congrats')
-                  setTimeout(() => {
-                     window.location.href = '/chat';
-                  }, 3000)
+                  setRegistrationProgress('create-password');
                }
+               setVerificationCorrect(false)
             }
             else {
                $('.inputStyle').css('border', '1px solid #d32f2f');
             }
+         },
+         error: (jqXHR, textStatus, errorThrown) => {
+            console.error(textStatus, errorThrown);
+            setVerificationCorrect(true);
          }
       });
 
@@ -322,8 +344,9 @@ const Security = () => {
 
       $.ajax({
          method: 'POST',
-         url: 'https://monkigo.com/app/v1/signin?token=' + localStorage.getItem('token'),
-         data: { login: email, password: signInPassword },
+         url: `${baseURL}/app/v1/security/signin`,
+         contentType: 'application/json',
+         data: JSON.stringify({ email: email, password: signInPassword }),
          dataType: 'json',
          success: (content) => {
             if (content.result.status === true) {
@@ -336,6 +359,10 @@ const Security = () => {
             else {
                setSignInPasswordCorrect(true);
             }
+         },
+         error: (jqXHR, textStatus, errorThrown) => {
+            console.error(textStatus, errorThrown);
+            setSignInPasswordCorrect(true);
          }
       });
    }
@@ -395,19 +422,14 @@ const Security = () => {
       }
 
       if ((signUpDetails.fName !== '' && validateNames(signUpDetails.fName)) &&
-         (signUpDetails.lName !== '' && validateNames(signUpDetails.lName)) &&
-         (signUpDetails.password.length >= 8 && validatePassword(signUpDetails.password))) {
+         (signUpDetails.lName !== '' && validateNames(signUpDetails.lName)) 
+         // (signUpDetails.password.length >= 8 && validatePassword(signUpDetails.password))
+         ) {
 
          $.ajax({
             method: 'POST',
-            url: '/app/v1/signup?token=' + token,
-            data: {
-               email: email,
-               firstname: signUpDetails.fName,
-               lastname: signUpDetails.lName,
-               password: signUpDetails.password,
-               confirmpassword: signUpDetails.password
-            }, dataType: 'json',
+            url: `${baseURL}/app/v1/security/signup-otp?email=${email}`,
+            dataType: 'json',
             success: (content) => {
                if (content.result.status) {
                   setVerifyForgot(false);
@@ -430,9 +452,8 @@ const Security = () => {
 
    function SendEmail() {
       $.ajax({
-         method: 'GET',
-         url: 'https://monkigo.com/app/v1/user/password/forgot',
-         data: { token: token, login: email },
+         method: 'POST',
+         url: `${baseURL}/app/v1/security/forgot-otp?email=${email}`,
          dataType: 'json',
          success: (content) => {
             if (content.result.status)
@@ -440,6 +461,26 @@ const Security = () => {
          }
       });
    }
+
+   useEffect(() => {
+      let intervalId;
+      if (isResend && timerCount > 0) {
+         intervalId = setInterval(() => {
+            setTimerCount((prev) => prev - 1);
+         }, 1000);
+      } else if (timerCount === 0) {
+         setIsResend(false);
+      }
+      return () => clearInterval(intervalId);
+   }, [isResend, timerCount]);
+
+   const handleResendClick = () => {
+      if (!isResend) {
+         SendEmail();
+         setIsResend(true);
+         setTimerCount(30);
+      }
+   };
 
    return (
       <div className="security-wrapper">
@@ -554,7 +595,7 @@ const Security = () => {
                                           <p className="modal-header__subtitle">We’ve sent a 6-digits code to you. Please check your e-mail adress and fill the box below.</p>
                                        </div>
                                        <div className="modal-body">
-                                          <div className="otp-form-list">
+                                          <div className="otp-form-list flex-col">
                                              <OTPInput
                                                 onChange={otpHandleChange}
                                                 isInputNum={true}
@@ -565,9 +606,22 @@ const Security = () => {
                                                 className={'otp-form-list__item'}
                                                 onKeyDown={() => verifyPasswordHandleKeyPress()}
                                              />
+                                             {
+                                             verificationCorrect === true ?
+                                                <span className="form-error flex-self-baseline">Not correct verification code.</span>
+                                                :
+                                                null
+                                             }
                                           </div>
                                           <button className="btn btn-fluid btn-primary m-t-32" onClick={() => verifySubmitHandler()}>Verify</button>
-                                          <div className="form-note text-right m-t-24">Did not receive? <a href="#" className="link font-weight-medium">Resend code</a></div>
+                                          <div className="form-note text-right m-t-24">Did not receive?{' '}
+                                             <span
+                                                className={`link font-weight-medium ${isResend ? 'disabled' : ''}`}
+                                                onClick={!isResend ? handleResendClick : undefined}
+                                                style={{ cursor: isResend ? 'not-allowed' : 'pointer' }}
+                                             >
+                                                {isResend ? `Resend code (${timerCount}s)` : 'Resend code'}
+                                             </span></div>
                                        </div>
                                     </div>
 
@@ -599,10 +653,40 @@ const Security = () => {
                                                    <span className={passwordValid === false ? 'password-control-rule' : 'password-control-rule checked'}>include letters and numbers</span>
                                                 </div>
                                              </div>
-                                             <button className="btn btn-fluid btn-primary m-t-20" onClick={(e) => passwordSubmitHandler(e)}>Continue</button>
+                                             <button className="btn btn-fluid btn-primary m-t-20" onClick={() => signInPasswordHandler()}>Continue</button>
                                           </div>
                                        </div>
                                        // End Step 5: Create New Password
+                                    : registrationProgress === 'create-password' ?
+
+                                       // Begin:: Step 5: Create Password
+
+                                       <div className="form-holder">
+                                          <div className="modal-header">
+                                             <span className="modal-header__action">
+                                                <span className="modal-header__action__btn icon-chevron-left" onClick={() => { setRegistrationProgress('enter-email'); resetAllStates() }}></span>
+                                             </span>
+                                             <h4 className="modal-header__title">Create a password.</h4>
+                                          </div>
+                                          <div className="modal-body">
+                                             <div className="form-field has-icon">
+                                                <input type={passwordShow === false ? 'password' : 'text'} className="form-control" autoComplete='new-password' placeholder="Create a password"
+                                                   onChange={(e) => passwordHandleChange(e)}
+                                                   onKeyDown={(e) => passwordHandleKeyPress(e)}
+                                                />
+                                                <span
+                                                   className={passwordShow === true ? 'field-icon clickable icon-eye-off' : 'field-icon clickable icon-eye'}
+                                                   onClick={() => passwordShow === false ? setPasswordShow(true) : setPasswordShow(false)}
+                                                ></span>
+                                                <div className="password-control m-t-16 m-b-32">
+                                                   <span className={passwordAtLeast8 === false ? 'password-control-rule' : 'password-control-rule checked'}>at least 8 characters</span>
+                                                   <span className={passwordValid === false ? 'password-control-rule' : 'password-control-rule checked'}>include letters and numbers</span>
+                                                </div>
+                                             </div>
+                                             <button className="btn btn-fluid btn-primary m-t-20" onClick={() => signUpHandler()}>Continue</button>
+                                          </div>
+                                       </div>
+                                       // End Step 5: Create Password
 
                                        : registrationProgress === 'sign-up' ?
 
@@ -635,17 +719,17 @@ const Security = () => {
                                                          null
                                                    }
                                                 </div>
-                                                <div className="form-field has-icon">
+                                                {/* <div className="form-field has-icon">
                                                    <input type={passwordShow === false ? 'password' : 'text'} className="form-control" placeholder="Create a password" autoComplete='off' name='password' onChange={(e) => signUpHandleChange(e)} onKeyDown={(e) => signUpSubmitHandlerKeyPress(e)} />
                                                    <span
                                                       className={passwordShow === true ? 'field-icon clickable icon-eye-off' : 'field-icon clickable icon-eye'}
                                                       onClick={() => passwordShow === false ? setPasswordShow(true) : setPasswordShow(false)}
                                                    ></span>
-                                                </div>
-                                                <div className="password-control m-t-16 m-b-32">
+                                                </div> */}
+                                                {/* <div className="password-control m-t-16 m-b-32">
                                                    <span className={signUpPasswordAtLeast8 === false ? 'password-control-rule' : 'password-control-rule checked'}>at least 8 characters</span>
                                                    <span className={signUpPasswordValid === false ? 'password-control-rule' : 'password-control-rule checked'}>include letters and numbers</span>
-                                                </div>
+                                                </div> */}
                                                 <button className="btn btn-fluid btn-primary" onClick={() => signUpSubmitHandler()}>Continue</button>
                                              </div>
                                           </div>

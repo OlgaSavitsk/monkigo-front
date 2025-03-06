@@ -127,10 +127,10 @@ const ChatUser = () => {
             }
          })
       }
-      else {
-         localStorage.clear();
-         window.location.href = "/auth"
-      }
+      // else {
+      //    localStorage.clear();
+      //    window.location.href = "/auth"
+      // }
    }, []);
 
    ///////GETTING AITA DATA

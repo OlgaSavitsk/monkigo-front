@@ -87,23 +87,25 @@ const HotelsResults = () => {
         }, 500)
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        var responseText = JSON.parse(jqXHR.responseText);
-        if (responseText.result.code === 403) {
-          if (responseText.data !== null || responseText.data !== undefined) {
-            if (responseText.data?.license === 'guest' || responseText.data?.expiringDate <= 0) {
-              // pop-up
+        if(jqXHR.responseText) {
+          var responseText = JSON.parse(jqXHR.responseText);
+          if (responseText.result.code === 403) {
+            if (responseText.data !== null || responseText.data !== undefined) {
+              if (responseText.data?.license === 'guest' || responseText.data?.expiringDate <= 0) {
+                // pop-up
+                window.location.href = "/auth"
+                // GetLicense();
+              }
+              else{
+                window.location.href = "/auth";
+              }
+            }
+            else {
               window.location.href = "/auth"
-              // GetLicense();
             }
-            else{
-              window.location.href = "/auth";
-            }
+          } else {
+            window.location.href = "/auth";
           }
-          else {
-            window.location.href = "/auth"
-          }
-        } else {
-          window.location.href = "/auth";
         }
       }
     });
