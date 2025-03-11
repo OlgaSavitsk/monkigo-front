@@ -46,24 +46,24 @@ const Security = () => {
    const [signupfNameErrorContent, setSignupfNameErrorContent] = useState('');
    const [signuplNameErrorContent, setSignuplNameErrorContent] = useState('');
 
-   function License() {
-      if (token === null) {
-         $.ajax({
-            method: 'GET',
-            url: 'https://monkigo.com/app/v1/license',
-            dataType: 'json',
-            success: (content) => {
-               if (content?.result.code === 200) {
-                  if (content?.data?.token !== null && content?.data?.token.trim() !== '') {
-                     localStorage.clear();
-                     localStorage.setItem('token', content.data.token);
-                     setToken(content.data.token);
-                  }
-               }
-            }
-         });
-      }
-   }
+   // function License() {
+   //    if (token === null) {
+   //       $.ajax({
+   //          method: 'GET',
+   //          url: 'https://monkigo.com/app/v1/license',
+   //          dataType: 'json',
+   //          success: (content) => {
+   //             if (content?.result.code === 200) {
+   //                if (content?.data?.token !== null && content?.data?.token.trim() !== '') {
+   //                   localStorage.clear();
+   //                   localStorage.setItem('token', content.data.token);
+   //                   setToken(content.data.token);
+   //                }
+   //             }
+   //          }
+   //       });
+   //    }
+   // }
 
    ////OTP HANDLE CHANGE
    function otpHandleChange(OTP) {
@@ -272,7 +272,8 @@ const Security = () => {
                   if (content.result.status) {
                      if (content.result.error === false) {
                         if (content.data !== null) {
-                           localStorage.setItem('user', JSON.stringify(content.data));
+                           const data = {...content.data, userId: content.data.user_preference.userid}
+                           localStorage.setItem('user', JSON.stringify(data));
                         }
                         setRegistrationProgress('congrats')
                         setTimeout(() => {
@@ -348,16 +349,34 @@ const Security = () => {
          contentType: 'application/json',
          data: JSON.stringify({ email: email, password: signInPassword }),
          dataType: 'json',
-         success: (content) => {
-            if (content.result.status === true) {
-               if (content.result.error === false) {
-                  localStorage.setItem('user', JSON.stringify(content.data));
-                  setSignInPasswordCorrect(false);
-                  window.location.href = '/chat';
-               }
-            }
-            else {
-               setSignInPasswordCorrect(true);
+         success: (signInResponse) => {
+            if (signInResponse.result.status === true && signInResponse.result.error === false) {
+               localStorage.setItem('user', JSON.stringify(signInResponse.data));
+              $.ajax({
+                method: 'GET',
+                url: `${baseURL}/app/v1/user/info`,
+                contentType: 'application/json',
+                headers: {
+                  "x-auth-key": signInResponse.data.token,
+                },
+                success: (userInfoResponse) => {
+                  if (userInfoResponse.result.status === true) {
+                     let userInfo = {...signInResponse.data }
+                     if(userInfoResponse.data.support) {
+                        userInfo = {...userInfo, support: userInfoResponse.data.support }
+                        setSignInPasswordCorrect(false);
+                        window.location.href = '/admin'
+                     } else {
+                        userInfo = { ...userInfo, ...userInfoResponse.data, userId: userInfoResponse.data.user_preference.userid}
+                        setSignInPasswordCorrect(false);
+                        window.location.href = '/chat';
+                     }
+                     localStorage.setItem('user', JSON.stringify(userInfo));
+                  }
+                },
+              });
+            } else {
+              setSignInPasswordCorrect(true);
             }
          },
          error: (jqXHR, textStatus, errorThrown) => {

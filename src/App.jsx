@@ -22,43 +22,32 @@ import TourPaymentStatus from './pages/PaymentStatusTour/PaymentStatusTour';
 function App() {
 
   function UserValidation() {
-    return new Promise(resolve => {
-      if (localStorage.getItem('token') !== null && localStorage.getItem('token') !== undefined) {
-        $.ajax({
-          method: 'GET',
-          url: 'https://monkigo.com/app/v1/user/validation/info',
-          data: { token: localStorage.getItem('token') },
-          success: function (content) {
-            if (content.data.license !== 'guest' && content.data.expiringDate > 0) {
-              return resolve(true);
-            }
-            else {
-              return resolve(false);
-            }
-          }
-        });
+    return new Promise((resolve) => {
+      const {token} = JSON.parse(localStorage.getItem('user'));
+      if (token) {
+        resolve(true);
+      } else {
+        resolve(false);
       }
     });
   }
-
+  
   async function Valid() {
     const result = await UserValidation();
     return result;
   }
-
-
+  
   Valid().then((value) => {
     if (value === false) {
       if (window.location.pathname !== '/auth' && window.location.pathname !== '/terms-conditions') {
         window.location.href = '/auth';
       }
     }
-  }
-  );
+  });
 
   function GetRole() {
     if (localStorage.getItem('user') !== null && localStorage.getItem('user') !== undefined) {
-      return JSON.parse(localStorage.getItem('user')).role;
+      return JSON.parse(localStorage.getItem('user')).support;
     }
     else {
       localStorage.clear();
@@ -71,8 +60,8 @@ function App() {
       <div className="App">
         <Routes>
           {
-            GetRole() === 'admin' || GetRole() === 'emp' ?
-              <Route exact path='/chat' element={<ChatAdmin />} />
+            GetRole() ?
+              <Route exact path='/admin' element={<ChatAdmin />} />
               :
               <Route exact path='/chat' element={<ChatUser />} />
           }
