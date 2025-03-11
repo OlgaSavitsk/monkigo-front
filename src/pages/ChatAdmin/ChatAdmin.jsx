@@ -9,19 +9,20 @@ import { uid } from 'uid';
 import Logo from '../../assets_concierge/images/logo/logo.svg';
 import LogoIAC from '../../../src/assets/navbar-second/logo-iac2023.svg';
 import useId from '@mui/material/utils/useId';
+import { useChat } from '../ChatUser/hooks/useChat';
+import ChatList from './ChatList';
+import MessageList from '../ChatUser/MessageList';
+
 
 const ChatAdmin = () => {
 
    const [inputBarActive, setInputBarActive] = useState(false);
    const [initChatsSocketConnection, setInitChatsSocketConnection] = useState(false);
-
-
-
    const [chatName, setChatName] = useState('Monkigo');
    const [sideBarToggle, setSideBarToggle] = useState(false);
    const [paymentDetailsModal, setPaymentDetailsModal] = useState(false);
-
-
+   const [currentUser, setCurrentUser] = useState(null);
+   const { activeChats, messages, setCurrentChatId, sendMessage, handleDeleteMessage } = useChat(currentUser);
    const chatSocketsArray = useRef([]);
    const chatSocket = useRef(null);
    const chatStore = useRef([]);
@@ -31,41 +32,22 @@ const ChatAdmin = () => {
    var pagination = 0;
 
    useEffect(() => {
-      localStorage.removeItem('chk');
-      if (localStorage.getItem('token') !== null && localStorage.getItem('token') !== undefined) {
-         $.ajax({
-            method: 'GET',
-            url: 'https://monkigo.com/app/v1/user/validation/info',
-            data: { token: localStorage.getItem('token') },
-            success: function (result) {
-               if (result.data.license !== 'guest' && result.data.expiringDate > 0) {
-                  return;
-               }
-               else {
-                  localStorage.clear();
-                  window.location.href = "/auth"
-               }
-            }
-         })
-      }
-      else {
-         localStorage.clear();
-         window.location.href = "/auth"
-      }
-   }, []);
+      const user = JSON.parse(localStorage.getItem('user'));
+      setCurrentUser(user);
+    }, []);
 
-   const sendMessageHandleChange = (e) => {
-      const { value } = e.target;
-      if (value.length > 0) {
-         setInputBarActive(true);
-      } else {
-         setInputBarActive(false);
+   useEffect(() => {
+      const { token } = JSON.parse(localStorage.getItem('user'));
+      const expiringDate = localStorage.getItem('expiringDate');
+  
+      if (!token || (expiringDate && new Date(expiringDate) <= new Date())) {
+        localStorage.clear();
+        window.location.href = '/auth';
       }
-
-   }
+    }, []);
 
    //////////SEND MESSAGE/////////
-   const sendMessage = () => {
+   const sendMessageHandler = () => {
       if ($('#messageText').val().trim() !== '') {
 
          var msgID = uid();
@@ -104,6 +86,7 @@ const ChatAdmin = () => {
          }
          chatStore.current.push(message);
          localStorage.setItem('store', JSON.stringify(chatStore.current));
+         sendMessage(message)
 
          if (chatSocket.current !== null) {
             if (chatSocket.current.readyState === 1) {
@@ -121,7 +104,7 @@ const ChatAdmin = () => {
    const sendMessageHandleKeyPress = (e) => {
       if (e.keyCode === 13 && !e.shiftKey) {
          if ($('#messageText').val().trim() !== '') {
-            sendMessage();
+            sendMessageHandler();
          }
       }
 
@@ -140,7 +123,6 @@ const ChatAdmin = () => {
    function ChatBodyScrollTo() {
 
       var chatBody = document.querySelector('#chatBody');
-
       chatBody.scrollTop = chatBody.scrollHeight;
    }
 
@@ -177,45 +159,10 @@ const ChatAdmin = () => {
       }
    }
 
-   useEffect(() => {
-      document.querySelector('.dashboard-navigation').addEventListener("scroll", (event) => {
-         if (event.target.scrollTop + event.target.clientHeight >= event.target.scrollHeight) {
-            pagination++;
-            $.ajax({
-               method: 'GET',
-               url: `https://monkigo.com/app/v1/concierge/chat/moderator/all/chats?token=${localStorage.getItem('token')}&p=${pagination}`,
-               success: (response) => {
-
-                  if (response.result.status && response.data) {
-                     var inbox = document.querySelector('.dashboard-navigation');
-
-                     for (var i = 0; i < response.data.length; i++) {
-                        var messageCount = '';
-                        if (response.data[i].unreadMsg > 0) {
-                           messageCount = `<span class="dashboard-navigation__badge">${response.data[i].unreadMsg}</span>`
-                        }
-                        var appendText = '';
-
-                        appendText = `
-                                    <a href="#" class="dashboard-navigation__item" id=${response.data[i].chk}>
-                                    <span class="dashboard-navigation__fullname">${response.data[i].name}</span>
-                                    <span class="dashboard-navigation__last-message">${response.data[i].from}: ${response.data[i].message}</span>
-                                    ${messageCount}
-                                 </a>`;
-
-                        $(inbox).append(appendText);                        
-                     }
-                  }
-               }
-            })
-         }
-      })
-   }, [])
-
    /////INBOX SOCKET
    useEffect(() => {
       if (initChatsSocketConnection === false) {
-         InitialInboxListenerSocket();
+         // InitialInboxListenerSocket();
       }
 
    }, []);
@@ -276,7 +223,7 @@ const ChatAdmin = () => {
             var appendText = '';
             if (msgContent[i].message === 'New') {
                appendText = `
-                  <a href="#" class="dashboard-navigation__item" id=${msgContent[i].chk}>
+                  <a href="#" class="dashboard-navigation__item" id=${msgContent[i].id}>
                   <span class="dashboard-navigation__fullname">New User</span>
                   <span class="dashboard-navigation__last-message">${msgContent[i].from} wait</span>
                   <span class="dashboard-navigation__badge">N</span>
@@ -284,16 +231,16 @@ const ChatAdmin = () => {
                   `;
             }
             else {
-               if (localStorage.getItem('chk') === msgContent[i].chk) {
+               if (localStorage.getItem('chk') === msgContent[i].id) {
                   appendText = `
-                     <a href="#" class="dashboard-navigation__item active" id=${msgContent[i].chk}>
+                     <a href="#" class="dashboard-navigation__item active" id=${msgContent[i].id}>
                      <span class="dashboard-navigation__fullname">${msgContent[i].name}</span>
                      <span class="dashboard-navigation__last-message">${msgContent[i].from}: ${msgContent[i].message}</span>
                   </a>`;
                }
                else {
                   appendText = `
-                        <a href="#" class="dashboard-navigation__item" id=${msgContent[i].chk}>
+                        <a href="#" class="dashboard-navigation__item" id=${msgContent[i].id}>
                         <span class="dashboard-navigation__fullname">${msgContent[i].name}</span>
                         <span class="dashboard-navigation__last-message">${msgContent[i].from}: ${msgContent[i].message}</span>
                         ${messageCount}
@@ -377,6 +324,7 @@ const ChatAdmin = () => {
          $('#chatBody').children('.chat-messenger__content').remove();
          $('#chatBody').children('.alert').remove();
          GetChatMessages(e.currentTarget.id);
+         setCurrentChatId(e.currentTarget.id)
 
          chatDateDivider_Today = false;
          chatDateDivider_Yesterday = false;
@@ -396,7 +344,7 @@ const ChatAdmin = () => {
             }
          }
 
-         InitialChatSocket();
+         // InitialChatSocket();
 
          $('.chat-admin-section .chat-messenger__footer').css('display', 'flex');
          $('.chat-messenger__getStart__text').css('display', 'none')
@@ -405,7 +353,7 @@ const ChatAdmin = () => {
             $('.dashboard-sidebar').css('left', '0');
          }
       });
-   }, []);
+   }, [activeChats]);
 
    function GetCurrentLocalTime(date) {
       var event = new Date(date);
@@ -471,7 +419,7 @@ const ChatAdmin = () => {
                         msgID: msgContent.msgID,
                         target: 'read'
                      }
-
+                     sendMessage(messageReadStatus)
                      if (chatSocket.current.readyState === 1) {
                         chatSocket.current.send(new TextEncoder().encode(JSON.stringify(messageReadStatus)));
                      }
@@ -574,171 +522,164 @@ const ChatAdmin = () => {
    });
 
    function GetChatMessages(chk) {
-      $.ajax({
-         method: 'GET',
-         url: `https://monkigo.com/app/v1/concierge/chat/messages/get?token=${localStorage.getItem('token')}&chk=${chk}`,
-         dataType: 'json',
-         success: (content) => {
-            if (content.result.status) {
+      const selectedChat = activeChats.find(chat => chat.id === chk);
+      if (selectedChat) {
+         for (let key in selectedChat.messages) {
+            var msgContent = selectedChat.messages[key];
+            var appendText = ''
+            if (msgContent.role === 1) {
 
-               for (var i = 0; i < content.data.length; i++) {
-                  var msgContent = content.data[i];
-                  var appendText = ''
-                  if (msgContent.role === 1) {
-
-                     if (msgContent.target === 'message') {
-                        AppendDateDivider(msgContent.date);
-                        appendText = `
-                           <div class="chat-messenger__content content-right content-admin" id='${msgContent.msgID}'>
-                              <div class="chat-messenger__content__container">
-                                 <div class="chat-messenger__avatar">
-                                    <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                                       class="img-fluid border-radius-full" alt="avatar" />
-                                 </div>
-                                 <div class="chat-messenger__holder">
-                                    <div class="chat-messenger__text" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-                                       ${msgContent.body}
-                                       <div class="remove-admin-message-btn" style="cursor: pointer;">
-                                          <img src='${process.env.PUBLIC_URL}/images_concierge/other/icon/x.svg'/>
-                                       </div>
-                                    </div>
-                                    <div class="chat-messenger__statusbar">
-                                    <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(GetCurrentLocalTime(msgContent.date))}</span>
-                                    <span class="chat-messenger__status ${msgContent.isRead ? 'readed' : 'sended'}"></span>
-                                </div>                                       
+               if (msgContent.target === 'message') {
+                  AppendDateDivider(msgContent.timestamp);
+                  appendText = `
+                     <div class="chat-messenger__content content-right content-admin" id='${key}'>
+                        <div class="chat-messenger__content__container">
+                           <div class="chat-messenger__avatar">
+                              <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
+                                 class="img-fluid border-radius-full" alt="avatar" />
+                           </div>
+                           <div class="chat-messenger__holder">
+                              <div class="chat-messenger__text" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                                 ${msgContent.body}
+                                 <div class="remove-admin-message-btn" style="cursor: pointer;">
+                                    <img src='${process.env.PUBLIC_URL}/images_concierge/other/icon/x.svg'/>
                                  </div>
                               </div>
+                              <div class="chat-messenger__statusbar">
+                              <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(GetCurrentLocalTime(msgContent.timestamp))}</span>
+                              <span class="chat-messenger__status ${msgContent.isRead ? 'readed' : 'sended'}"></span>
+                          </div>                                       
                            </div>
-                        `
-                     }
+                        </div>
+                     </div>
+                  `
+               }
 
-                     if (msgContent?.target === 'pay_status') {
-                        var payStatus = JSON.parse(msgContent.body)
-                        appendText = `
-                        <div class="alert ${payStatus.status ? 'alert-success' : 'alert-danger'}">
-                        Payment ${payStatus.status ? 'successful' : 'canceled'}. (Amount: $${payStatus.total})
-                       </div>
-                        `;
-                     }
+               if (msgContent?.target === 'pay_status') {
+                  var payStatus = JSON.parse(msgContent.body)
+                  appendText = `
+                  <div class="alert ${payStatus.status ? 'alert-success' : 'alert-danger'}">
+                  Payment ${payStatus.status ? 'successful' : 'canceled'}. (Amount: $${payStatus.total})
+                 </div>
+                  `;
+               }
 
-                     if (msgContent.target === 'pay_link') {
-                        var payLink = JSON.parse(msgContent.body);
-                        appendText = `
+               if (msgContent.target === 'pay_link') {
+                  var payLink = JSON.parse(msgContent.body);
+                  appendText = `
+                  <div class="chat-messenger__content content-right content-admin" id='${msgContent.msgID}'>
+                     <div class="chat-messenger__content__container">
+                        <div class="chat-messenger__avatar">
+                              <img src="${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png"
+                                 class="img-fluid border-radius-full" alt="avatar">
+                        </div>
+                        <div class="chat-messenger__holder">
+                              <div class="chat-messenger__text" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                                 Click the button to pay
+                                 <div class="remove-admin-message-btn" style="cursor: pointer;">
+                                    <img src='${process.env.PUBLIC_URL}/images_concierge/other/icon/x.svg'/>
+                                 </div>
+                              </div>
+                              <span class="chat-messenger__price">Price: $${payLink.amount}</span>
+                              <div class="chat-messenger__statusbar">
+                                 <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
+                                 <span class="chat-messenger__status ${msgContent.isRead ? 'readed' : 'sended'}"></span>
+                           </div>                                  
+                        </div>
+                     </div>
+                     <div class="chat-messenger__content__action" style="margin-right:64px;margin-left:auto;">
+                        <a href="${payLink.url}" class="btn btn-fluid btn-primary" data-modal="modal-pay">Pay</a>
+                     </div>
+                  </div>
+                  `;
+                  }
+
+                  if (msgContent.target === 'main_link') {
+                     appendText = `
                      <div class="chat-messenger__content content-right content-admin" id='${msgContent.msgID}'>
                         <div class="chat-messenger__content__container">
                            <div class="chat-messenger__avatar">
-                                 <img src="${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png"
-                                    class="img-fluid border-radius-full" alt="avatar">
+                              <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
+                                 class="img-fluid border-radius-full" alt="avatar" />
                            </div>
-                           <div class="chat-messenger__holder">
-                                 <div class="chat-messenger__text" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-                                    Click the button to pay
-                                    <div class="remove-admin-message-btn" style="cursor: pointer;">
-                                       <img src='${process.env.PUBLIC_URL}/images_concierge/other/icon/x.svg'/>
-                                    </div>
-                                 </div>
-                                 <span class="chat-messenger__price">Price: $${payLink.amount}</span>
-                                 <div class="chat-messenger__statusbar">
-                                    <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                                    <span class="chat-messenger__status ${msgContent.isRead ? 'readed' : 'sended'}"></span>
-                                </div>                                  
+                           <div class="chat-messenger__content__action" style="margin-left: auto;">
+                              <div class="btn-group">
+                              <button id="btnHotelsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 91px">Hotels</button>
+                              <button id="btnFlightsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 92px">Flights</button>
+                              <button id="btnTransfer" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 102px">Transfer</button>
+                              <button id="btnVillageLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 138px">Budget Room</button>
+                              <button id="btnSocialTour" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 120px">Social Tour</button>
+                              </div>
+                              <div class="chat-messenger__content__info">
+                                 For group booking, please contact
+                                 <br />
+                                 <a href="mailto:hospitality@iac2023.org" class="link">hospitality@iac2023.org</a>
+                              </div>
+                              <div class="chat-messenger__statusbar">
+                              <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
+                              <span class="chat-messenger__status ${msgContent.isRead ? 'readed' : 'sended'}"></span>
+                        </div>    
                            </div>
-                        </div>
-                        <div class="chat-messenger__content__action" style="margin-right:64px;margin-left:auto;">
-                           <a href="${payLink.url}" class="btn btn-fluid btn-primary" data-modal="modal-pay">Pay</a>
                         </div>
                      </div>
-                     `;
-                     }
+                  `;
+                                 }
 
-                     if (msgContent.target === 'main_link') {
-                        appendText = `
-         <div class="chat-messenger__content content-right content-admin" id='${msgContent.msgID}'>
-            <div class="chat-messenger__content__container">
-               <div class="chat-messenger__avatar">
-                  <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                     class="img-fluid border-radius-full" alt="avatar" />
-               </div>
-               <div class="chat-messenger__content__action" style="margin-left: auto;">
-                  <div class="btn-group">
-                  <button id="btnHotelsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 91px">Hotels</button>
-                  <button id="btnFlightsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 92px">Flights</button>
-                  <button id="btnTransfer" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 102px">Transfer</button>
-                  <button id="btnVillageLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 138px">Budget Room</button>
-                  <button id="btnSocialTour" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 120px">Social Tour</button>
+                                 if (msgContent.target === 'passport_details') {
+                                    appendText = `
+                  <div class="chat-messenger__content content-right content-admin" id='${msgContent.msgID}'>
+                  <div class="chat-messenger__content__container">
+                     <div class="chat-messenger__avatar">
+                        <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
+                           class="img-fluid border-radius-full" alt="avatar" />
+                     </div>
+                     <div class="chat-messenger__holder">
+                        <div class="chat-messenger__text">Click button to search for passport details.</div>
+                        <div class="chat-messenger__statusbar">
+                        <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
+                        <span class="chat-messenger__status ${msgContent.isRead ? 'readed' : 'sended'}"></span>
+                  </div>    
+                     </div>
                   </div>
-                  <div class="chat-messenger__content__info">
-                     For group booking, please contact
-                     <br />
-                     <a href="mailto:hospitality@iac2023.org" class="link">hospitality@iac2023.org</a>
+                  <div class="chat-messenger__content__action" style="margin-right:64px;margin-left:auto;">
+                     <button id="btnOpenPassportDetails" class="btn btn-fluid btn-primary">Enter passport details</button>
                   </div>
-                  <div class="chat-messenger__statusbar">
-                  <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                  <span class="chat-messenger__status ${msgContent.isRead ? 'readed' : 'sended'}"></span>
-              </div>    
-               </div>
-            </div>
-         </div>
-      `;
-                     }
+                  </div>
 
-                     if (msgContent.target === 'passport_details') {
-                        appendText = `
-    <div class="chat-messenger__content content-right content-admin" id='${msgContent.msgID}'>
-      <div class="chat-messenger__content__container">
-         <div class="chat-messenger__avatar">
-            <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-               class="img-fluid border-radius-full" alt="avatar" />
-         </div>
-         <div class="chat-messenger__holder">
-            <div class="chat-messenger__text">Click button to search for passport details.</div>
-            <div class="chat-messenger__statusbar">
-            <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-            <span class="chat-messenger__status ${msgContent.isRead ? 'readed' : 'sended'}"></span>
-        </div>    
-         </div>
-      </div>
-      <div class="chat-messenger__content__action" style="margin-right:64px;margin-left:auto;">
-         <button id="btnOpenPassportDetails" class="btn btn-fluid btn-primary">Enter passport details</button>
-      </div>
-   </div>
-   
-      `;
-                     }
-
-                  }
-                  else {
-
-                     if (msgContent.target === 'message') {
-                        AppendDateDivider(msgContent.date);
-                        appendText = `
-                           <div class="chat-messenger__content content-left content-user" id='${msgContent.msgID}'>
-                              <div class="chat-messenger__content__container">
-                                 <div class="chat-messenger__avatar">
-                                    <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png'
-                                       class="img-fluid border-radius-full" alt="avatar" />
-                                 </div>
-                                 <div class="chat-messenger__holder">
-                                    <div class="chat-messenger__text">${msgContent.body}</div>                                    
-                                         <div class="chat-messenger__statusbar">
-                                            <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(GetCurrentLocalTime(msgContent.date))}</span>
-                                            <span class="chat-messenger__status"></span>
-                                         </div>    
-                                 </div>
-                              </div>
-                           </div>
-                        `;
-                     }
-
-                  }
-
-                  $('#chatBody').append(appendText);
-                  ChatBodyScrollTo();
+                  `;
                }
 
             }
+            else {
+
+               if (msgContent.target === 'message') {
+                  AppendDateDivider(msgContent.timestamp);
+                  appendText = `
+                     <div class="chat-messenger__content content-left content-user" id='${msgContent.msgID}'>
+                        <div class="chat-messenger__content__container">
+                           <div class="chat-messenger__avatar">
+                              <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png'
+                                 class="img-fluid border-radius-full" alt="avatar" />
+                           </div>
+                           <div class="chat-messenger__holder">
+                              <div class="chat-messenger__text">${msgContent.body}</div>                                    
+                                   <div class="chat-messenger__statusbar">
+                                      <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(GetCurrentLocalTime(msgContent.timestamp))}</span>
+                                      <span class="chat-messenger__status"></span>
+                                   </div>    
+                           </div>
+                        </div>
+                     </div>
+                  `;
+               }
+
+            }
+
+            $('#chatBody').append(appendText);
+            ChatBodyScrollTo();
          }
-      });
+
+      }
    }
 
    useEffect(() => {
@@ -830,6 +771,7 @@ const ChatAdmin = () => {
                      }
 
                      if (chatSocket.current !== null && chatSocket.current !== undefined) {
+                        sendMessage(message)
                         if (chatSocket.current.readyState === 1) {
                            chatSocket.current.send(new TextEncoder().encode(JSON.stringify(message)))
                         }
@@ -874,14 +816,14 @@ const ChatAdmin = () => {
             msgID: $(e.currentTarget).parent().parent().parent().parent().attr('id'),
             target: 'delete'
          }
-
+         handleDeleteMessage($(e.currentTarget).parent().parent().parent().parent().attr('id'))
          if (chatSocket.current !== null) {
             if (chatSocket.current.readyState === 1) {
                chatSocket.current.send(new TextEncoder().encode(JSON.stringify(message)));
             }
          }
       });
-   }, []);
+   }, [handleDeleteMessage]);
 
    /////////////////////////SEND MAIN BUTTONS
    const sendMainButtons = () => {
@@ -926,6 +868,7 @@ const ChatAdmin = () => {
       if (chatSocket.current !== null && chatSocket.current !== undefined) {
          chatStore.current.push(message);
          localStorage.setItem('store', JSON.stringify(chatStore.current));
+         sendMessage(message)
          if (chatSocket.current.readyState === 1) {
             chatSocket.current.send(new TextEncoder().encode(JSON.stringify(message)));
          }
@@ -933,6 +876,10 @@ const ChatAdmin = () => {
          ChatBodyScrollTo();
       }
    }
+
+   const handleSelectChat = (chatId) => {
+      setCurrentChatId(chatId);
+    };  
 
    /////////////////////////SEND PASSPORT DETAILS
    const sendPassportDetailsButtons = () => {
@@ -970,6 +917,7 @@ const ChatAdmin = () => {
       if (chatSocket.current !== null && chatSocket.current !== undefined) {
          chatStore.current.push(message);
          localStorage.setItem('store', JSON.stringify(chatStore.current));
+         sendMessage(message)
          if (chatSocket.current.readyState === 1) {
             chatSocket.current.send(new TextEncoder().encode(JSON.stringify(message)));
          }
@@ -1033,6 +981,7 @@ const ChatAdmin = () => {
                   </div>
                </div>
                <div className="dashboard-navigation">
+                  <ChatList activeChats={activeChats} onSelectChat={handleSelectChat} />
                </div>
             </div>
             <div className="dashboard-container">
@@ -1044,6 +993,7 @@ const ChatAdmin = () => {
                            <span className="chat-messenger__mobile-toggle icon-chevron-left" style={{ cursor: 'pointer' }} onClick={() => setSideBarToggle(true)}></span>
                         </div>
                      </div>
+                     <MessageList messages={messages} />
                      <div className="chat-messenger__getStart__text">
                         <span>Select a chat to start messaging.</span>
                      </div>
@@ -1069,11 +1019,11 @@ const ChatAdmin = () => {
                         </div>
                         <div className="chat-messenger__footer__form">
                            <div className="form-field has-icon">
-                              <textarea id='messageText' type="text" className="form-control" placeholder="Type your message" onChange={(e) => sendMessageHandleChange(e)} onKeyDown={(e) => sendMessageHandleKeyPress(e)} onKeyUp={(e) => sendMessageHandleKeyUp(e)} />
+                              <textarea id='messageText' type="text" className="form-control" placeholder="Type your message" /* onChange={(e) => sendMessageHandleChange(e)} */ onKeyDown={(e) => sendMessageHandleKeyPress(e)} onKeyUp={(e) => sendMessageHandleKeyUp(e)} />
                               <button className="chat-messenger__btn icon-send" id='send-message-btn' style={{
                                  backgroundColor: inputBarActive === true ? '#274DE0' : 'transparent',
                                  color: inputBarActive === true ? '#fff' : '#101010'
-                              }} onClick={() => sendMessage()}></button>
+                              }} onClick={() => sendMessageHandler()}></button>
                            </div>
                         </div>
                      </div>

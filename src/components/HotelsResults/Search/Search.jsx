@@ -12,12 +12,12 @@ import autoAnimate from '@formkit/auto-animate';
 
 ////IMPORT MUI DATE PICKER
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-import { LicenseInfo } from '@mui/x-license-pro';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+// import { LicenseInfo } from '@mui/x-license-pro';
 
 
-LicenseInfo.setLicenseKey(process.env.REACT_APP_MUI_LICENSE_KEY);
+// LicenseInfo.setLicenseKey(process.env.REACT_APP_MUI_LICENSE_KEY);
 
 const Search = ({ filterDetails }) => {
    //CALENDAR DROPDOWN TOGGLE
@@ -251,63 +251,6 @@ const Search = ({ filterDetails }) => {
                      </div>
                   </div>
 
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                     <DateRangePicker
-                        disablePast
-                        label="Advanced keyboard"
-                        value={value}
-                        showToolbar={false}
-                        inputFormat="DD-MM-YYYY"
-                        onChange={(newValue) => {
-                           if (newValue[1] !== null) {
-                              if (new Date(newValue[0].toString()).getDay() === new Date(newValue[1].toString()).getDay()) {
-                                 if (new Date(newValue[0].toString()).getDate() === new Date(newValue[1].toString()).getDate())
-                                    newValue[1] = newValue[1].add(1, 'day');
-                              }
-                           }
-                           setValue(newValue);
-                           localStorage.setItem('cin', GetDate(newValue[0]));
-                           if (newValue[1] !== null || newValue[1] !== undefined) {
-                              localStorage.setItem('cout', GetDate(newValue[1]));
-                           }
-                        }}
-                        renderInput={(startProps, endProps) => (
-                           <React.Fragment>
-                              <div className="check_in-section">
-                                 {/* CHECK IN */}
-                                 <div className="check_in" onClick={(e) => { dropdownToggle === 'check in' ? setDropdownToggle(null) : setDropdownToggle('check in'); e.stopPropagation(); }}>
-                                    <button type='button' className='check-in-button'>Check-in
-                                       <label htmlFor="check-in"></label>
-                                       <input className='check-in-input'
-                                          ref={startProps.inputRef}
-                                          {...startProps.inputProps}
-                                          readOnly={true}
-                                          id={'check-in'}
-                                       />
-                                    </button>
-                                 </div>
-                              </div>
-
-                              {/* CHECK IN CHECK OUT SECTION */}
-                              <div className="check_out-section">
-                                 {/* CHECK OUT */}
-                                 <div className="check_out" onClick={(e) => { dropdownToggle === 'check out' ? setDropdownToggle(null) : setDropdownToggle('check out'); e.stopPropagation(); }}>
-                                    <button type='button' className='check-out-button'>Check-out
-                                       <label htmlFor="check-out"></label>
-                                       <input className='check-out-input'
-                                          ref={endProps.inputRef}
-                                          {...endProps.inputProps}
-                                          readOnly={true}
-                                          id={'check-out'}
-                                       />
-                                    </button>
-                                 </div>
-                              </div>
-
-                           </React.Fragment>
-                        )}
-                     />
-                  </LocalizationProvider>
 
                   <button className="search-button"
                      onClick={() => {
@@ -337,67 +280,6 @@ const Search = ({ filterDetails }) => {
                   </div>
 
                   <div className="second-section">
-                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateRangePicker
-                           disablePast
-                           label="Advanced keyboard"
-                           value={value}
-                           showToolbar={false}
-                           inputFormat="DD-MM-YYYY"
-                           onChange={(newValue) => {
-                              if (newValue[1] !== null) {
-                                 if (new Date(newValue[0].toString()).getDay() === new Date(newValue[1].toString()).getDay()) {
-                                    if (new Date(newValue[0].toString()).getDate() === new Date(newValue[1].toString()).getDate())
-                                       newValue[1] = newValue[1].add(1, 'day');
-                                 }
-                              }
-                              setValue(newValue);
-                              localStorage.setItem('cin', GetDate(newValue[0]));
-                              if (newValue[1] !== null || newValue[1] !== undefined) {
-                                 localStorage.setItem('cout', GetDate(newValue[1]));
-                              }
-                           }}
-                           renderInput={(startProps, endProps) => (
-                              <React.Fragment>
-                                 <div className="check_in-section">
-                                    {/* CHECK IN */}
-                                    <div className="check_in" onClick={(e) => {
-                                       dropdownToggle === 'check in' ? setDropdownToggle(null) : setDropdownToggle('check in'); e.stopPropagation();
-                                       filterDetails.setPostState(true);
-                                    }}>
-                                       <button type='button' className='check-in-button'>
-                                          <label htmlFor="check-in-tablet"></label>
-                                          <span>Check-in</span>
-                                          <input className='check-in-input'
-                                             ref={startProps.inputRef}
-                                             {...startProps.inputProps}
-                                             readOnly={true}
-                                             id={'check-in-tablet'}
-                                          />
-                                       </button>
-                                    </div>
-                                 </div>
-
-                                 {/* CHECK IN CHECK OUT SECTION */}
-                                 <div className="check_out-section">
-                                    {/* CHECK OUT */}
-                                    <div className="check_out" onClick={(e) => { dropdownToggle === 'check out' ? setDropdownToggle(null) : setDropdownToggle('check out'); e.stopPropagation(); }}>
-                                       <button type='button' className='check-out-button'>
-                                          <span>Check-out</span>
-                                          <label htmlFor="check-out-tablet"></label>
-                                          <input className='check-out-input'
-                                             ref={endProps.inputRef}
-                                             {...endProps.inputProps}
-                                             readOnly={true}
-                                             id={'check-out-tablet'}
-                                          />
-                                       </button>
-                                    </div>
-                                 </div>
-                              </React.Fragment>
-                           )}
-                        />
-                     </LocalizationProvider>
 
                      <button className="search-button" onClick={() => {
                         filterDetails.hotelSearchBtnClick ? filterDetails.setHotelSearchBtnClick(false) : filterDetails.setHotelSearchBtnClick(true);
@@ -427,65 +309,6 @@ const Search = ({ filterDetails }) => {
                   </div>
 
                   <div className="second-section">
-                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateRangePicker
-                           disablePast
-                           label="Advanced keyboard"
-                           value={value}
-                           showToolbar={false}
-                           inputFormat="DD-MM-YYYY"
-                           onChange={(newValue) => {
-                              if (newValue[1] !== null) {
-                                 if (new Date(newValue[0].toString()).getDay() === new Date(newValue[1].toString()).getDay()) {
-                                    if (new Date(newValue[0].toString()).getDate() === new Date(newValue[1].toString()).getDate())
-                                       newValue[1] = newValue[1].add(1, 'day');
-                                 }
-                              }
-                              setValue(newValue);
-                              localStorage.setItem('cin', GetDate(newValue[0]));
-                              if (newValue[1] !== null || newValue[1] !== undefined) {
-                                 localStorage.setItem('cout', GetDate(newValue[1]));
-                              }
-                           }}
-                           renderInput={(startProps, endProps) => (
-                              <React.Fragment>
-                                 <div className="check_in-section">
-                                    {/* CHECK IN */}
-                                    <div className="check_in" onClick={(e) => { dropdownToggle === 'check in' ? setDropdownToggle(null) : setDropdownToggle('check in'); e.stopPropagation(); }}>
-                                       <button type='button' className='check-in-button'>
-                                          <span>Check-in</span>
-                                          <label htmlFor="check-in-tablet-small"></label>
-                                          <input className='check-in-input'
-                                             ref={startProps.inputRef}
-                                             {...startProps.inputProps}
-                                             readOnly={true}
-                                             id={'check-in-tablet-small'}
-                                          />
-                                       </button>
-                                    </div>
-                                 </div>
-
-                                 {/* CHECK IN CHECK OUT SECTION */}
-                                 <div className="check_out-section">
-                                    {/* CHECK OUT */}
-                                    <div className="check_out" onClick={(e) => { dropdownToggle === 'check out' ? setDropdownToggle(null) : setDropdownToggle('check out'); e.stopPropagation(); }}>
-                                       <button type='button' className='check-out-button'>
-                                          <span>Check-out</span>
-                                          <label htmlFor="check-out-tablet-small"></label>
-                                          <input className='check-out-input'
-                                             ref={endProps.inputRef}
-                                             {...endProps.inputProps}
-                                             readOnly={true}
-                                             id={'check-out-tablet-small'}
-                                          />
-                                       </button>
-                                    </div>
-                                 </div>
-
-                              </React.Fragment>
-                           )}
-                        />
-                     </LocalizationProvider>
                   </div>
 
                   <button className="search-button" onClick={() => {
@@ -511,66 +334,6 @@ const Search = ({ filterDetails }) => {
                      </div>
                   </div>
 
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                     <DateRangePicker
-                        disablePast
-                        label="Advanced keyboard"
-                        value={value}
-                        showToolbar={false}
-                        inputFormat="DD-MM-YYYY"
-                        onChange={(newValue) => {
-                           if (newValue[1] !== null) {
-                              if (new Date(newValue[0].toString()).getDay() === new Date(newValue[1].toString()).getDay()) {
-                                 if (new Date(newValue[0].toString()).getDate() === new Date(newValue[1].toString()).getDate())
-                                    newValue[1] = newValue[1].add(1, 'day');
-                              }
-                           }
-                           setValue(newValue);
-                           localStorage.setItem('cin', GetDate(newValue[0]));
-                           if (newValue[1] !== null || newValue[1] !== undefined) {
-                              localStorage.setItem('cout', GetDate(newValue[1]));
-                           }
-                        }}
-                        renderInput={(startProps, endProps) => (
-                           <React.Fragment>
-                              <div className="check_in-section">
-                                 {/* CHECK IN */}
-                                 <div className="check_in" onClick={(e) => { dropdownToggle === 'check in' ? setDropdownToggle(null) : setDropdownToggle('check in'); e.stopPropagation(); }}>
-                                    <button type='button' className='check-in-button'>
-                                       <span>Check-in</span>
-                                       <label htmlFor="check-in-mobile"></label>
-                                       <input className='check-in-input'
-                                          ref={startProps.inputRef}
-                                          {...startProps.inputProps}
-                                          readOnly={true}
-                                          id={'check-in-mobile'}
-                                       />
-                                    </button>
-                                 </div>
-                              </div>
-
-                              {/* CHECK IN CHECK OUT SECTION */}
-                              <div className="check_out-section">
-                                 {/* CHECK OUT */}
-                                 <div className="check_out" onClick={(e) => { dropdownToggle === 'check out' ? setDropdownToggle(null) : setDropdownToggle('check out'); e.stopPropagation(); }}>
-                                    <button type='button' className='check-out-button'>
-                                       <span>Check-out</span>
-                                       <label htmlFor="check-out-mobile"></label>
-                                       <input className='check-out-input'
-                                          ref={endProps.inputRef}
-                                          {...endProps.inputProps}
-                                          readOnly={true}
-                                          id={'check-out-mobile'}
-                                       />
-                                    </button>
-                                 </div>
-                              </div>
-
-
-                           </React.Fragment>
-                        )}
-                     />
-                  </LocalizationProvider>
 
                   <button className="search-button" onClick={() => {
                      filterDetails.hotelSearchBtnClick ? filterDetails.setHotelSearchBtnClick(false) : filterDetails.setHotelSearchBtnClick(true);
