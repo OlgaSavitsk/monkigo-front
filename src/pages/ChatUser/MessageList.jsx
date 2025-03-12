@@ -109,9 +109,9 @@ const MessageItem = ({ message }) => {
           {renderMessageContent()}
           <div className="chat-messenger__statusbar">
             <span className="chat-messenger__date">
-              {new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(
-                new Date(message.timestamp)
-              )}
+            {new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(
+                message.timestamp ? new Date(message.timestamp) : new Date()
+            )}
             </span>
             <span className={`chat-messenger__status ${message.isRead ? 'readed' : 'sended'}`}></span>
           </div>
