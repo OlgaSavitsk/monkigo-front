@@ -11,9 +11,12 @@ import Navbar from '../../components/Navbar/Navbar'
 import Details from '../../components/TourCheckout/Details/Details';
 import Reservation from '../../components/TourCheckout/Reservation/Reservation';
 import ArrowBackBlack from '../../assets/hotel-checkout/arrow-back-black.svg';
+import { config } from '../../config';
 
 ///IMPORT IMAGES
 import ArrowTopWhite from '../../assets/hotel-checkout/arrow-top-white.svg';
+
+const baseURL = config.baseURL;
 
 const TourCheckout = () => {
 
@@ -34,7 +37,7 @@ const TourCheckout = () => {
 
       $.ajax({
          method: 'GET',
-         url: `https://monkigo.com/app/v1/iac2023/social/tour-checkout`,
+         url: `${baseURL}/app/v1/tours`,
          data: { token: localStorage.getItem('token'), id: tourID.current },
          dataType: "json",
          success: function (content) {            
@@ -42,7 +45,7 @@ const TourCheckout = () => {
               
                if (content.data.length > 0) {
                   
-                  setTourCheckOutData(content.data[0]);
+                  setTourCheckOutData(content.data);
                }
                else {
                   setTourCheckOutData(null);
@@ -56,7 +59,9 @@ const TourCheckout = () => {
       GetTourCheckout();
    }, []);
 
-
+   const tour = tourCheckOutData?.find(t => t.info[0].id === localStorage.getItem('tourID') );
+   const tourInfo = tour ? tour.info[0] : null;
+   
    return (
       <div className="tour-checkout-section">
          <Navbar />
@@ -68,8 +73,8 @@ const TourCheckout = () => {
             <ProgressBar tourCheckOutData={tourCheckOutData} />
             <div className="tour-checkout-main-details-section">
                <div className="main-details-section-inner">
-                  <Details tourCheckOutData={tourCheckOutData} />
-                  <Reservation tourCheckOutData={tourCheckOutData} />
+                  <Details tourCheckOutData={tourInfo} />
+                  <Reservation tourCheckOutData={tourInfo} />
                </div>
             </div>
 
@@ -82,8 +87,8 @@ const TourCheckout = () => {
                      resultsResponsive === true ?
                         <ul>
                            <li>
-                              <span>{tourCheckOutData?.info[0].name}</span>
-                              <span>${tourCheckOutData?.info[0].price}</span>
+                              <span>{tourInfo.name}</span>
+                              <span>${tourInfo.price}</span>
                            </li>
    
                         </ul>
@@ -92,7 +97,7 @@ const TourCheckout = () => {
                   }
                   <div className="total-area">
                      <span>Total</span>
-                     <h3>${tourCheckOutData?.info[0].price}</h3>
+                     <h3>${tourInfo?.price}</h3>
                   </div>
                </div>
             </div>

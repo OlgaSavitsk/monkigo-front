@@ -23,8 +23,8 @@ function App() {
 
   function UserValidation() {
     return new Promise((resolve) => {
-      const {token} = JSON.parse(localStorage.getItem('user'));
-      if (token) {
+      const token = JSON.parse(localStorage.getItem('user'));
+      if (token?.token) {
         resolve(true);
       } else {
         resolve(false);
@@ -59,14 +59,16 @@ function App() {
     <Router key={new Date()}>
       <div className="App">
         <Routes>
-          {
-            GetRole() ?
-              <Route exact path='/admin' element={<ChatAdmin />} />
-              :
-              <Route exact path='/chat' element={<ChatUser />} />
-          }
+          <Route 
+                path='/admin' 
+                element={GetRole() ? <ChatAdmin /> : <Navigate to="/chat" replace />} 
+            />
+            <Route 
+                path='/chat' 
+                element={<ChatUser />} 
+            />
           <Route exact path='/auth' element={<Security />} />
-          <Route exact path='/' element={<HotelsResults />} />
+          <Route exact path='/hotels' element={<HotelsResults />} />
           <Route exact path={`/hotel`} element={<HotelPage />} />
           <Route exact path='/checkout' element={<HotelCheckout />} />
           <Route exact path='/map' element={<Map />} />
@@ -76,10 +78,7 @@ function App() {
           <Route exact path='/tour' element={<SingleTour />} />
           <Route exact path='/tour-checkout' element={<TourCheckout />} />
           <Route exact path='/tour/payment-status' element={<TourPaymentStatus />} />
-          <Route
-            path="*"
-            element={<Navigate to="/" replace />}
-          />
+          <Route path="*" element={<Navigate to={GetRole() ? "/admin" : "/chat"} replace />} />
         </Routes>
       </div>
     </Router>

@@ -106,6 +106,7 @@ const ChatAdmin = () => {
          if ($('#messageText').val().trim() !== '') {
             sendMessageHandler();
          }
+         e.preventDefault();
       }
 
       if (e.keyCode === 13 && e.shiftKey) {

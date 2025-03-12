@@ -18,22 +18,24 @@ const PaymentStatus = () => {
    const [orderData, setOrderData] = useState(null);
 
    useEffect(() => {
-      $.ajax({
-         method: 'GET',
-         url: 'https://monkigo.com/app/v1/iac2023/social/tour/info',
-         data: {
-            token: localStorage.getItem('token'),
-            o: new URLSearchParams(window.location.search).get('o')
-         },
-         dataType: 'json',
-         success: (content) => {         
-            if (content?.data?.payStatus){
-               SendConfirmEmail();
-             }
+      const bookingCode = new URLSearchParams(window.location.search).get('bookingCode');
+      setOrderData(bookingCode)
+      // $.ajax({
+      //    method: 'GET',
+      //    url: 'https://monkigo.com/app/v1/iac2023/social/tour/info',
+      //    data: {
+      //       token: localStorage.getItem('token'),
+      //       o: new URLSearchParams(window.location.search).get('o')
+      //    },
+      //    dataType: 'json',
+      //    success: (content) => {         
+      //       if (content?.data?.payStatus){
+      //          SendConfirmEmail();
+      //        }
             
-            setOrderData(content.data);
-         }
-      });
+      //       setOrderData(content.data);
+      //    }
+      // });
    }, []);
 
    function SendConfirmEmail() {
@@ -59,7 +61,7 @@ const PaymentStatus = () => {
                   <div className="payment-text-area">
                      {
                         orderData !== null && orderData !== undefined ?
-                           orderData.payStatus === true ?
+                           orderData ?
                               <img src={MonkeySuccessful} alt="" />
                               :
                               <img src={MonkeyUnSuccessful} alt="" />
@@ -70,13 +72,13 @@ const PaymentStatus = () => {
                      <div className="text-area-inner">
                         {
                            orderData !== null & orderData !== undefined ?
-                              <h3>{orderData.payStatus === true ? 'Your reservation is confirmed.' : 'Your payment is unsuccessful'}</h3>
+                              <h3>{orderData ? 'Your reservation is confirmed.' : 'Your payment is unsuccessful'}</h3>
                               :
                               <Skeleton variant="rounded" width={'100%'} height={'20px'} style={{ marginBottom: '20px' }} />
                         }
                         {
                            orderData !== null & orderData !== undefined ?
-                              <span>{orderData.payStatus === true  ? 'You will get a confirmation e-mail and all the details to the given address:' : 
+                              <span>{orderData  ? 'You will get a confirmation e-mail and all the details to the given address:' : 
                                'Please ensure you have sufficient funds in your account and you do not exceed your credit limit.'                   
                               }</span>
                               :
@@ -84,18 +86,18 @@ const PaymentStatus = () => {
                         }
 
 
-                        {
+                        {/* {
 
                            orderData?.payStatus === true  ?
                               <a href="#">{orderData?.email}</a>                 
                               :
                               null        
-                        }
+                        } */}
                      </div>
                      {
                         orderData !== null && orderData !== undefined ?
                            <button type='button' onClick={() => {
-                              window.location.href = `https://iac.monkigo.com/chat`
+                              window.location.href = `/chat`
                            }}>Get back to the Concierge</button>
                            :
                            <Skeleton variant="rounded" width={'100%'} height={'40px'} style={{ marginBottom: '20px' }} />
@@ -122,7 +124,7 @@ const PaymentStatus = () => {
                      }                              
                   </div>
 
-                  <div className="date-wrapper">
+                  {/* <div className="date-wrapper">
                      <div className="check-in">
                         {
                            orderData !== null && orderData !== undefined ?
@@ -152,12 +154,12 @@ const PaymentStatus = () => {
                         }
 
                      </div>
-                  </div>
+                  </div> */}
                   {
-                     orderData !== null && orderData !== undefined && orderData.payStatus ?
+                     orderData !== null && orderData !== undefined ?
                         <div className="reservation-code-area">
                            <span>Reservation code</span>
-                           <span>{orderData?.id.toUpperCase()}</span>
+                           <span>{orderData?.toUpperCase()}</span>
                         </div>
                         : null
                   }
