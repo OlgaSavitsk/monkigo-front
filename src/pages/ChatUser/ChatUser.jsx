@@ -36,7 +36,9 @@ import { Pagination, FreeMode, Navigation, Thumbs } from "swiper";
 import { uid } from 'uid';
 import { useChat } from './hooks/useChat';
 import MessageList from './MessageList';
+import { config } from '../../config';
 
+const baseURL = config.baseURL;
 
 const ChatUser = () => {
 
@@ -83,6 +85,8 @@ const ChatUser = () => {
    const [transferPassengerNumber, setTransferPassengerNumber] = useState('');
    const [transferTimePopupActive, setTransferTimePopupActive] = useState(false);
    const [currentUser, setCurrentUser] = useState(null);
+   const [ token, setToken ] = useState(null);
+   const [isInitialMessageShown, setIsInitialMessageShown] = useState(false);
    const { messages, sendMessage } = useChat(currentUser);
 
    const socketState = useRef(null);
@@ -98,10 +102,10 @@ const ChatUser = () => {
 
     
    useEffect(() => {
-      const {token} = JSON.parse(localStorage.getItem('user'));
-      const expiringDate = localStorage.getItem('expiringDate');
-  
-      if (!token || (expiringDate && new Date(expiringDate) <= new Date())) {
+      const { token } = JSON.parse(localStorage.getItem('user'));
+      setToken(token)
+
+      if (!token) {
         localStorage.clear();
         window.location.href = '/auth';
       }
@@ -156,36 +160,36 @@ const ChatUser = () => {
    /////
    useEffect(() => {
       const chatBody = document.querySelector('#chatBody');
-      $(chatBody).prepend(`
-         <div class="chat-messenger__content content-left content-admin">
-            <div class="chat-messenger__content__container">
+      if (!isInitialMessageShown) {
+         $(chatBody).prepend(`
+           <div class="chat-messenger__content content-left content-admin">
+             <div class="chat-messenger__content__container">
                <div class="chat-messenger__avatar">
-                  <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                     class="img-fluid border-radius-full" alt="avatar" />
+                 <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
+                   class="img-fluid border-radius-full" alt="avatar" />
                </div>
                <div class="chat-messenger__holder">
-                  <div class="chat-messenger__text">Hi, <br /> I’m Monki! How can I help you?
-                  </div>
-                  <div class="chat-messenger__statusbar">
-                  <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                  <span class="chat-messenger__status"></span>
-              </div> 
+                 <div class="chat-messenger__text">Hi, <br /> I’m Monki! How can I help you?</div>
+                 <div class="chat-messenger__statusbar">
+                   <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
+                   <span class="chat-messenger__status"></span>
+                 </div> 
                </div>
-            </div>
-            <div class="chat-messenger__content__action">
+             </div>
+             <div class="chat-messenger__content__action">
                <div class="btn-group">
-                  <button id="btnHotelsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 91px">Hotels</button>
-                  <button id="btnFlightsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 92px">Flights</button>
-                  <button id="btnSocialTour" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 120px">Social Tour</button>
+                 <button id="btnHotelsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 91px">Hotels</button>
+                 <button id="btnFlightsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 92px">Flights</button>
+                 <button id="btnSocialTour" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 120px">Social Tour</button>
                </div>
                <div class="chat-messenger__content__info">
-                  For group booking, please contact
-                  <br />
-                  <a href="mailto:hospitality@iac2023.org" class="link">hospitality@iac2023.org</a>
+                 For group booking, please contact
+                 <br />
+                 <a href="mailto:hospitality@iac2023.org" class="link">hospitality@iac2023.org</a>
                </div>
-            </div>
-         </div>
-      `);
+             </div>
+           </div>
+         `);
 
       ChatBodyScrollTo();
 
@@ -274,10 +278,6 @@ const ChatUser = () => {
          `);
 
          ChatBodyScrollTo();
-      });
-
-      $(document).on('click', '#btnHotelsSearch', () => {
-         window.location.href = `http://38.242.129.219:3000/hotels`;
       });
 
       ///////////////////////////////////////////////////VILLAGE/////////////////////////////////////////////////////
@@ -389,8 +389,25 @@ const ChatUser = () => {
          }
 
       });
+      
+         // Устанавливаем флаг, что сообщение было показано
+         setIsInitialMessageShown(true);
+       }
 
-   }, []);
+   }, [isInitialMessageShown]);
+
+   const handleHotelsSearch = () => {
+      const queryParams = new URLSearchParams();
+      queryParams.append('token', token);
+      window.location.href = `${baseURL}/hotels-concierge?${queryParams.toString()}`;
+    };
+  
+    useEffect(() => {
+      $(document).on('click', '#btnHotelsSearch', handleHotelsSearch);
+      return () => {
+        $(document).off('click', '#btnHotelsSearch', handleHotelsSearch);
+      };
+    }, [handleHotelsSearch]);
 
    function GetCurrentLocalTime(date) {
       var event = new Date(date);
@@ -398,7 +415,6 @@ const ChatUser = () => {
       event.setHours(event.getHours() + (getOffset * -1));
       return event;
    }
-
 
    setInterval(() => {
       if (socketState.current !== null) {
@@ -1207,7 +1223,16 @@ const ChatUser = () => {
                   role: 0,
                   type: 0,
                   target: "message",
-                  body: messageBody
+                  // body: messageBody,
+                  body: '',
+                  items: [
+                     `${flightDirection} / ${flightClasses} class`,
+                     `${GuestCountCalc()}`,
+                     `From: ${fromInput1}`,
+                     `To: Baku (GYD)`,
+                     `Departure: ${new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[0]))}`,
+                     `Return: ${value[1] !== null ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[1])) : 'No Return'}`
+                 ],
                }
                chatStore.current.push(message);
                localStorage.setItem('store', JSON.stringify(chatStore.current));
@@ -1218,7 +1243,7 @@ const ChatUser = () => {
                   }
                }
 
-               $('#chatBody').append(appendText);
+               // $('#chatBody').append(appendText);
                ChatBodyScrollTo();
                setTimeout(() => {
 
@@ -1249,8 +1274,7 @@ const ChatUser = () => {
 
                   chatStore.current.push(message);
                   localStorage.setItem('store', JSON.stringify(chatStore.current));
-                  sendMessage(message)
-                  socketState.current.send(JSON.stringify(message));
+                  socketState.current?.send(JSON.stringify(message));
                   ChatBodyScrollTo();
                }, 1000);
                setModalContent(null);
@@ -1323,7 +1347,6 @@ const ChatUser = () => {
             }
             chatStore.current.push(message);
             localStorage.setItem('store', JSON.stringify(chatStore.current));
-            sendMessage(message)
 
             socketState.current.send(JSON.stringify(message));
 
@@ -2117,7 +2140,7 @@ const ChatUser = () => {
                            className="form-control placeholder-medium from-input"
                            placeholder="City"
                            autoComplete='off'
-                           onChange={(e) => setIata(e.target.value)}
+                           // onChange={(e) => setIata(e.target.value)}
                            onClick={(e) => e.stopPropagation()}
                         />
                         <img src={Close} className='zero-input-value' onClick={() => {

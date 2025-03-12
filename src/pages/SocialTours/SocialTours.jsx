@@ -5,11 +5,11 @@ import './socialtours.scss';
 ////IMPORT IMAGES
 import Banner from '../../assets_concierge/images/template/banner/banner.png';
 import ArrowBottomBlack from '../../assets_concierge/images/other/icon/arrow-bottom-accordion-black.svg';
-
-
-
-///IMPORT COMPONENT
 import Navbar from '../../components/Navbar/Navbar';
+import { config } from '../../config';
+import { formatDate } from '../../utils';
+
+const baseURL = config.baseURL;
 
 const SocialTours = () => {
    const [accordionActive, setAccordionActive] = useState(null);
@@ -22,17 +22,16 @@ const SocialTours = () => {
    function GetTours() {
       $.ajax({
          method: 'GET',
-         url: `https://monkigo.com/app/v1/iac2023/social/tours?token=${localStorage.getItem('token')}`,
+         url: `${baseURL}/app/v1/tours`,
          success: (content) => {
             if (content.result.status === true) {
-               if (content.result.data !== null) {
+               if (content.data !== null) {
                   setTour(content.data);
                }
             }
          }
       });
    }
-
 
    return (
       <div className="social-tours-section">
@@ -83,7 +82,7 @@ const SocialTours = () => {
 
                               <div className="single-accordion-wrapper" key={i}>
                                  <div className="single-accordion-header" onClick={() => accordionActive === i ? setAccordionActive(null) : setAccordionActive(i)}>
-                                    <span>{t.eventDate}</span>
+                                    <span>{formatDate(t.eventDate)}</span>
                                     <img src={ArrowBottomBlack} style={{ transform: accordionActive === i ? 'rotate(180deg)' : 'rotate(0)' }} alt="" />
                                  </div>
 
@@ -112,7 +111,7 @@ const SocialTours = () => {
                      </div>
 
                      <div className="all-tours-wrapper">
-                        <a href="/tour?id=a7422a3b9d2a4bd18997a883a2f15d48" target='_blank'><div className="single-tour-container">
+                        <a href="/tour?id=1" target='_blank'><div className="single-tour-container">
                            <div className="tour-image">
                               <img src="https://cdn.monkigo.com/tours/10a778ea57b94a96b2c1e2c327c04135/1.jpg" alt="" />
                            </div>
@@ -120,7 +119,7 @@ const SocialTours = () => {
                               <span>Old City Walking Tour</span>
                            </div>
                         </div></a>
-                        <a href="/tour?id=32fb31e1eb8740e081d275e6844f018f" target='_blank'><div className="single-tour-container">
+                        <a href="/tour?id=2" target='_blank'><div className="single-tour-container">
                            <div className="tour-image">
                               <img src="https://cdn.monkigo.com/tours/79ca9b8b134f48a2ad7cbfc9cd766073/1.jpg" alt="" />
                            </div>
@@ -128,7 +127,7 @@ const SocialTours = () => {
                               <span>Fire-worshipping Heritage Tour</span>
                            </div>
                         </div></a>
-                        <a href="/tour?id=37928598fe39467eac813409285b23b0" target='_blank'><div className="single-tour-container">
+                        <a href="/tour?id=3" target='_blank'><div className="single-tour-container">
                            <div className="tour-image">
                               <img src="https://cdn.monkigo.com/tours/308435f97a8843538634f65a14a2005b/1.jpg" alt="" />
                            </div>

@@ -5,20 +5,30 @@ import './details.scss';
 import autoAnimate from '@formkit/auto-animate';
 
 import $ from 'jquery';
+import { formatDate } from '../../../utils';
+import { config } from '../../../config';
 
+const baseURL = config.baseURL;
 
 const Details = ({ tourCheckOutData }) => {
+   const [email, setEmail] = useState('');
+   const [surname, setSurname] = useState('');
 
    ///AUTO ANIMATE
    const parent = useRef(null);
 
    useEffect(() => {
       parent.current && autoAnimate(parent.current)
-   }, [parent]);
 
-
+         const user = JSON.parse(localStorage.getItem("user"));
+         if (user) {
+            setEmail(user.email || '');
+            setSurname(user.lastName || ''); 
+         }
+   }, []);
 
    function PostData(type) {
+      var user = JSON.parse(localStorage.getItem("user"));
       var orderData = {};
       var emailElement = document.getElementById('email');
       var nameElement = document.getElementById('name');
@@ -47,23 +57,25 @@ const Details = ({ tourCheckOutData }) => {
          emailElement.style.border = '1px solid red';    
          return;
       }
-            
       orderData = {
-         tourID:new URLSearchParams(window.location.search).get('id'),
-         name:nameElement.value,
-         lastName:lastNameElement.value,
-         email:emailElement.value
-      };
+         book_type: "TOUR",
+         book_entity_ids: [tourCheckOutData.id],
+         currency: "USD",
+         amount: tourCheckOutData.price
+     }
 
       if (type === 'T') {
          $.ajax({
             method: 'POST',
-            url: `https://monkigo.com/app/v1/iac2023/social/tour/booking?token=${localStorage.getItem('token')}`,
-            data: orderData,
+            url: `${baseURL}/app/v1/payment/iac`,
+            data: JSON.stringify(orderData),
             dataType: 'json',
-            success: function (data) {
-              
-               window.location.href = `https://monkigo.com/app/v1/payments/v2/pay?token=${localStorage.getItem('token')}&source=iac&target=card&type=2&data=${data.data.id}`
+            contentType: 'application/json',
+            headers: {
+               'x-auth-key': user?.token
+            },
+            success: function ({data}) {
+               window.location.href = `${data}`
             }
          });
       }
@@ -81,12 +93,12 @@ const Details = ({ tourCheckOutData }) => {
                <div className="check-in">
                   <span>Date</span>
 
-                  <h3>{tourCheckOutData?.eventDate}</h3>
+                  <h3>{tourCheckOutData?.eventDa && formatDate(tourCheckOutData?.eventDa)}</h3>
                </div>
                <div className="check-out">
                   <span>Time</span>
 
-                  <h3>{tourCheckOutData?.info[0].time}</h3>
+                  <h3>{tourCheckOutData?.time}</h3>
                </div>
             </div>
          </div>
@@ -97,7 +109,7 @@ const Details = ({ tourCheckOutData }) => {
             <div className="email-wrapper">
                <label htmlFor="email">E-mail adress</label>
 
-               <input type="email" defaultValue={tourCheckOutData?.info[0].user[0].email} id="email" />
+               <input type="email" defaultValue={email} id="email" />
             </div>
          </div>
 
@@ -109,19 +121,19 @@ const Details = ({ tourCheckOutData }) => {
                <div className="name-surname-wrapper">
                   <div className="name-wrapper">
                      <label htmlFor="name">Given name</label>
-                     <input type="text" defaultValue={tourCheckOutData?.info[0].user[0].name} id="name" />
+                     <input type="text" defaultValue={tourCheckOutData?.name} id="name" />
                   </div>
 
                   <div className="surname-wrapper">
                      <label htmlFor="surname">Surname</label>
-                     <input type="text" defaultValue={tourCheckOutData?.info[0].user[0].lastName} id="surname" />
+                     <input type="text" defaultValue={surname} id="surname" />
                   </div>
                </div>
             </div>
          </div>
 
          <div className="reverse-button-wrapper">
-            <button onClick={()=>{PostData('T')}} type='button'>Reserve ${tourCheckOutData?.info[0].price}</button>
+            <button onClick={()=>{PostData('T')}} type='button'>Reserve ${tourCheckOutData?.price}</button>
          </div>
       </div>
    )

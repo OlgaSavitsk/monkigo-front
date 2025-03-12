@@ -274,6 +274,7 @@ const Security = () => {
                         if (content.data !== null) {
                            const data = {...content.data, userId: content.data.user_preference.userid}
                            localStorage.setItem('user', JSON.stringify(data));
+                           localStorage.setItem('token', content.data.token);
                         }
                         setRegistrationProgress('congrats')
                         setTimeout(() => {
@@ -372,6 +373,7 @@ const Security = () => {
                         window.location.href = '/chat';
                      }
                      localStorage.setItem('user', JSON.stringify(userInfo));
+                     localStorage.setItem('token', userInfo.token);
                   }
                 },
               });

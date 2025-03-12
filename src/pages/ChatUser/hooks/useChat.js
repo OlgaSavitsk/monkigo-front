@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   ref,
   onValue,
@@ -20,7 +20,7 @@ export function useChat(user) {
 
   const userId = user?.userId;
   const isAdmin = user?.support;
-
+  
   useEffect(() => {
     if (!user) return;
 
@@ -57,7 +57,6 @@ export function useChat(user) {
 
   useEffect(() => {
     if (!currentChatId) return;
-
     const messagesRef = ref(db, `chats/${currentChatId}/messages`);
     const messagesQuery = query(messagesRef, orderByChild("timestamp"));
 
@@ -76,6 +75,7 @@ export function useChat(user) {
   }, [currentChatId]);
 
   useEffect(() => {
+    if(!isAdmin) return
     const chatsRef = ref(db, "chats");
 
     const unsubscribe = onValue(chatsRef, (snapshot) => {

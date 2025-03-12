@@ -4,12 +4,16 @@ import './singletour.scss';
 
 ///IMPORT COMPONENT
 import Navbar from '../../components/Navbar/Navbar';
+import { config } from '../../config';
+import { formatDate } from '../../utils';
 
 import OnMapImage from '../../assets/iac-congress-map.png';
 
+const baseURL = config.baseURL;
+
 const SingleTour = () => {
 
-   const [tour, setTour] = useState(null);
+   const [tours, setTours] = useState(null);
 
    useEffect(() => {
       const tourID = new URLSearchParams(window.location.search).get('id');
@@ -20,17 +24,22 @@ const SingleTour = () => {
    function GetTour() {
       $.ajax({
          method: 'GET',
-         url: `https://monkigo.com/app/v1/iac2023/social/tour`,
+         url: `${baseURL}/app/v1/tours`,
          data: { token: localStorage.getItem('token'), id: localStorage.getItem('tourID') },
          success: (content) => {
             if (content.result.status === true) {
-               if (content.result.data !== null) {
-                  setTour(content.data[0]);
+               if (content.data !== null) {
+                  setTours(content.data);
                }
             }
          }
       });
    }
+   const tour = tours?.find(t => t.info[0].id === localStorage.getItem('tourID') );
+   const tourInfo = tour ? tour.info[0] : null;
+    if (!tourInfo) {
+        return <div>Tour not found.</div>;
+    }
 
    return (
       <div className="single-tour-section">
@@ -40,8 +49,8 @@ const SingleTour = () => {
 
          {/* <!-- Begin:: Section Banner --> */}
          <section className="section-banner">
-            <div className={`section-banner__img s${tour?.info[0]?.id}`} style={{
-               backgroundImage: `url(https://cdn.monkigo.com/tours/${tour?.info[0]?.id}/1.jpg)`
+            <div className={`section-banner__img s${tourInfo.id}`} style={{
+               backgroundImage: `url(data:image/jpeg;base64,${tourInfo.img[0]})`
             }}>               
             </div>
          </section>
@@ -54,11 +63,11 @@ const SingleTour = () => {
                {/* <!-- Begin:: RESERVE AREA --> */}
                <div className="single-tour-reserve-area">
                   <div className="tour-name">
-                     <h2>{tour?.info[0].name}</h2>
+                     <h2>{tourInfo.name}</h2>
                   </div>
 
                   <div className="reserve-button">
-                     <button onClick={() => { window.location.href = `/tour-checkout?id=${localStorage.getItem('tourID')}` }} type='button'>Reserve ${tour?.info[0].price}</button>
+                     <button onClick={() => { window.location.href = `/tour-checkout?id=${localStorage.getItem('tourID')}` }} type='button'>Reserve ${tourInfo.price}</button>
                   </div>
                </div>
                {/* <!-- End:: RESERVE AREA --> */}
@@ -71,12 +80,12 @@ const SingleTour = () => {
 
                   <div className="single-information-wrapper">
                      <ul>
-                        <li>Duration: <span>{tour?.info[0].duration}</span></li>
-                        <li>Date: <span>{tour?.eventDate}</span></li>
-                        <li>Time: <span>{tour?.info[0].time}</span></li>
-                        <li>Number of people in the group: <span>{tour?.info[0].numberOfPeople}</span></li>
+                        <li>Duration: <span>{tourInfo.duration}</span></li>
+                        <li>Date: <span>{tourInfo.eventDate && formatDate(tourInfo?.eventDate)}</span></li>
+                        <li>Time: <span>{tourInfo.time}</span></li>
+                        <li>Number of people in the group: <span>{tourInfo.numberOfPeople}</span></li>
                         <li>Meeting point: <span>Congress Venue</span></li>
-                        <li>Included: <span>{tour?.info[0].included}</span></li>
+                        <li>Included: <span>{tourInfo.included}</span></li>
                         <li>Language of the tour: <span>English</span></li>
                      </ul>
                   </div>
@@ -89,7 +98,7 @@ const SingleTour = () => {
                      <span>Description</span>
                   </div>
 
-                  <p>{tour?.info[0].desc}</p>
+                  <p>{tourInfo.description}</p>
                </div>
                {/* <!-- End:: Area Descrıptıon --> */}
 
@@ -102,8 +111,8 @@ const SingleTour = () => {
                   <div className="single-information-wrapper">
                      <ul>
                      {
-                        tour?.info[0].planning.map((p, i) => (
-                           <li>{p.time} - <span>{p.content}</span></li>
+                        tourInfo.planning.map((p, i) => (
+                           <li key={i}>{p.time} - <span>{p.content}</span></li>
                         ))
                      }             
                      </ul>
@@ -131,8 +140,8 @@ const SingleTour = () => {
 
                   <div className="gallery-wrapper">
                      {
-                        tour?.info[0].img.map((img, i) => (
-                           <img key={i} src={`https://cdn.monkigo.com/tours/${tour?.info[0]?.id}/${img}`} alt="social tour" />
+                        tourInfo.img.map((img, i) => (
+                           <img key={i} src={`data:image/jpeg;base64,${img}`} alt="social tour" />
                         ))
                      }
                   </div>

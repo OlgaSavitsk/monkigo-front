@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from 'jquery';
 
 const MessageList = ({ messages }) => {
   return (
@@ -16,6 +17,11 @@ const MessageItem = ({ message }) => {
   const avatarSrc = isAdmin
     ? `${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png`
     : `${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png`;
+  function ChatBodyScrollTo() {
+    var chatBody = document.querySelector('#chatBody');
+
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
 
   const renderMessageContent = () => {
     switch (message.target) {
@@ -86,7 +92,10 @@ const MessageItem = ({ message }) => {
         );
 
       default:
-        return <div className="chat-messenger__text">{message.body}</div>;
+        ChatBodyScrollTo()
+        return message.items ? message.items.map((item, index) => (
+          <span key={index} className="info-list__item">{item}</span>
+      )) : <div className="chat-messenger__text">{message.body}</div>;
     }
   };
 
