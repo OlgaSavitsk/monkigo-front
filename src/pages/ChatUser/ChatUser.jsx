@@ -399,7 +399,7 @@ const ChatUser = () => {
    const handleHotelsSearch = () => {
       const queryParams = new URLSearchParams();
       queryParams.append('token', token);
-      window.location.href = `${baseURL}/hotels-concierge?${queryParams.toString()}`;
+      window.location.href = `http://38.242.129.219:3000/hotels-concierge?${queryParams.toString()}`;
     };
   
     useEffect(() => {
@@ -1022,7 +1022,7 @@ const ChatUser = () => {
 
    /////////////////////////////////////////////SEARCH Transfer BUTTON ON CLICKS FUNCTION////////////////////////////////////////////
    $(document).on('click', '#btnTransferSearch', () => {
-      setModalContent('transfer-details');
+      // setModalContent('transfer-details');
    });
 
    ////////////////////////////////////////////ADD ANOTHER PASSENGER//////////////////////////////////////////

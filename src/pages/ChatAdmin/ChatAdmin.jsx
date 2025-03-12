@@ -34,7 +34,7 @@ const ChatAdmin = () => {
    useEffect(() => {
       const user = JSON.parse(localStorage.getItem('user'));
       setCurrentUser(user);
-    }, []);
+    }, [setCurrentUser]);
 
    useEffect(() => {
       const { token } = JSON.parse(localStorage.getItem('user'));
