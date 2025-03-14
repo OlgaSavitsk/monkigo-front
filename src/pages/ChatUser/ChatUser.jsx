@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { ref, push, onValue, set, update } from 'firebase/database';
+import { db } from '../../firebase';
 import './chatuser.scss';
 import '../../assets_concierge/styles/main.css';
 
@@ -14,9 +16,6 @@ import Banner from '../../assets_concierge/images/template/banner/banner.png';
 import Close from '../../assets_concierge/images/other/icon/close.svg';
 import CalendarImg from '../../assets_concierge/images/other/icon/calendar.svg';
 
-////IMPORT MUI DATE PICKER
-
-import dayjs, { Dayjs } from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers-pro';
 import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
@@ -34,18 +33,35 @@ import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import { Pagination, FreeMode, Navigation, Thumbs } from "swiper";
 import { uid } from 'uid';
-import { useChat } from './hooks/useChat';
 import MessageList from './MessageList';
 import { config } from '../../config';
 
 const baseURL = config.baseURL;
+const buttons = [
+   { id: "btnHotelsLink", label: "Hotels", key: "Hotels" },
+   { id: "btnFlightsLink", label: "Flights", key: "Flights" },
+   { id: "btnSocialTour", label: "Social Tour", key: "Tours" },
+ ];
+
+ const predefinedResponses = {
+   Hotels: [
+     {
+       text: "Click button to search for hotels.",
+       id: 'btnHotelsSearch',
+     },
+   ],
+   Tours: [
+     {
+       text: "Click button to search for social tours.",
+       id: "btnSocialTourSearch",
+     },
+   ],
+   Flights: [{ text: "Click button to search for flights.", id: "btnFlightsSearch" }],
+ };
 
 const ChatUser = () => {
-
-   const [userMessage, setUserMessage] = useState('');
    const [inputBarActive, setInputBarActive] = useState(false);
    const [btnSendMessage, setBtnSendMessage] = useState(false);
-   const [initSocket, setInitSocket] = useState(false);
    const [modalContent, setModalContent] = useState(null);
    const [typeOfFlightModal, setTypeOfFlightModal] = useState(false);
    const [typeOfClassesModal, setTypeOfClassesModal] = useState(false);
@@ -86,8 +102,8 @@ const ChatUser = () => {
    const [transferTimePopupActive, setTransferTimePopupActive] = useState(false);
    const [currentUser, setCurrentUser] = useState(null);
    const [ token, setToken ] = useState(null);
-   const [isInitialMessageShown, setIsInitialMessageShown] = useState(false);
-   const { messages, sendMessage } = useChat(currentUser);
+   const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
 
    const socketState = useRef(null);
    const chatStore = useRef([]);
@@ -95,11 +111,64 @@ const ChatUser = () => {
    var chatDateDivider_Yesterday = false;
    var chatDateDivider_Exists = [];
 
-   useEffect(() => {
-      const user = JSON.parse(localStorage.getItem('user'));
-      setCurrentUser(user);
-    }, []);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if(user) {
+       setCurrentUser(user);
+    }
+  }, [setCurrentUser]);
 
+  useEffect(() => {
+    const messagesRef = ref(db, `chats/${currentUser?.userId}/messages`);
+    const unsubscribe = onValue(messagesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const messageList = Object.entries(data).map(([id, msg]) => ({
+          id,
+          ...msg
+        }));
+        setMessages(messageList);
+
+        // Mark messages as read when user views them
+        const updates = {};
+        messageList.forEach(msg => {
+          if (msg.sender === 'admin' && msg.status !== 'read') {
+            updates[`chats/${currentUser?.userId}/messages/${msg.id}/status`] = 'read';
+          }
+        });
+        if (Object.keys(updates).length > 0) {
+          update(ref(db), updates);
+        }
+
+        // Reset unread count
+        set(ref(db, `chats/${currentUser?.userId}/unreadCount`), 0);
+      }
+      ChatBodyScrollTo();
+    });
+
+    return () => unsubscribe();
+  }, [currentUser?.userId]);
+
+  const sendMessage = (text, type = 'text', props = null) => {
+    const messagesRef = ref(db, `chats/${currentUser?.userId}/messages`);
+    const messagesRefName = ref(db, `chats/${currentUser?.userId}`);
+    let messageData = {
+      text,
+      sender: currentUser?.userId,
+      timestamp: Date.now(),
+      type,
+      status: 'sent',
+  };
+
+   if (props) {
+      messageData = {
+         ...messageData, ...props
+      }; 
+   }
+
+   push(messagesRef, messageData);
+   update(messagesRefName, {name: `${currentUser?.firstName} ${currentUser?.lastName}`,})
+  };
     
    useEffect(() => {
       const { token } = JSON.parse(localStorage.getItem('user'));
@@ -117,6 +186,20 @@ const ChatUser = () => {
       })
    })
 
+   const sendAdminResponse = (message) => {
+      if (message.sender !== "admin" && message.key) {
+        const response = predefinedResponses[message.key][0];
+        sendMessage(response.text, 'button_click', {key: response.id, sender: 'admin'});
+      }
+    };
+   
+     useEffect(() => {
+       const lastMessage = messages[messages.length - 1];
+       if (lastMessage) {
+         sendAdminResponse(lastMessage);
+       }
+     }, [messages, sendAdminResponse]);
+
    //////TRANFER DETAILS PASSENGER NUMBER HANDLE CHANGE
    const tranferPassengerHandleChange = (event) => {
       const newValue = event.target.value.replace(/\D/g, '');
@@ -129,272 +212,15 @@ const ChatUser = () => {
       }
    };
 
-   ///////GETTING AITA DATA
-   // useEffect(() => {
-
-   //    try {
-   //       $.ajax({
-   //          method: 'GET',
-   //          url: `https://monkigo.com/dump/iata/search?token=${localStorage.getItem('token')}&s=${iata}`,
-   //          success: function (result) {
-   //             setIataData(result.data);
-   //          }
-   //       })
-   //    }
-   //    catch {
-
-   //    }
-
-   // }, [iata]);
-
    const sendMessageHandleChange = (e) => {
       const { value } = e.target;
-      setUserMessage(value);
+      setNewMessage(value);
       if (value.length > 0) {
          setInputBarActive(true);
       } else {
          setInputBarActive(false);
       }
    }
-
-   /////
-   useEffect(() => {
-      const chatBody = document.querySelector('#chatBody');
-      if (!isInitialMessageShown) {
-         $(chatBody).prepend(`
-           <div class="chat-messenger__content content-left content-admin">
-             <div class="chat-messenger__content__container">
-               <div class="chat-messenger__avatar">
-                 <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                   class="img-fluid border-radius-full" alt="avatar" />
-               </div>
-               <div class="chat-messenger__holder">
-                 <div class="chat-messenger__text">Hi, <br /> I’m Monki! How can I help you?</div>
-                 <div class="chat-messenger__statusbar">
-                   <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                   <span class="chat-messenger__status"></span>
-                 </div> 
-               </div>
-             </div>
-             <div class="chat-messenger__content__action">
-               <div class="btn-group">
-                 <button id="btnHotelsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 91px">Hotels</button>
-                 <button id="btnFlightsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 92px">Flights</button>
-                 <button id="btnSocialTour" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 120px">Social Tour</button>
-               </div>
-               <div class="chat-messenger__content__info">
-                 For group booking, please contact
-                 <br />
-                 <a href="mailto:hospitality@iac2023.org" class="link">hospitality@iac2023.org</a>
-               </div>
-             </div>
-           </div>
-         `);
-
-      ChatBodyScrollTo();
-
-      ////////////////////////////////////////////////////HOTELS /////////////////////////////////////
-      $(document).on('click', '#btnHotelsLink', () => {
-         $(chatBody).append(`
-            <div class="chat-messenger__content content-right content-user">
-               <div class="chat-messenger__content__container">
-                  <div class="chat-messenger__avatar">
-                     <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png'
-                        class="img-fluid border-radius-full" alt="avatar" />
-                  </div>
-                  <div class="chat-messenger__holder">
-                     <div class="chat-messenger__text">Hotels.</div>
-                     <div class="chat-messenger__statusbar">
-                     <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                     <span class="chat-messenger__status readed"></span>
-                 </div> 
-                  </div>
-               </div>
-            </div>
-         `);
-
-         $(chatBody).append(`
-            <div class="chat-messenger__content content-left content-admin">
-               <div class="chat-messenger__content__container">
-                  <div class="chat-messenger__avatar">
-                     <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                        class="img-fluid border-radius-full" alt="avatar" />
-                  </div>
-                  <div class="chat-messenger__holder">
-                     <div class="chat-messenger__text">Click button to search for hotels.</div>
-                     <div class="chat-messenger__statusbar">
-                     <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                     <span class="chat-messenger__status"></span>
-                 </div> 
-                  </div>
-               </div>
-               <div class="chat-messenger__content__action">
-                  <button id="btnHotelsSearch" class="btn btn-fluid btn-primary">Search</button>
-               </div>
-            </div>
-         `);
-         ChatBodyScrollTo();
-      });
-
-      //////////////////////////////////////////////////////FLIGHTS///////////////////////////////////////////////
-      $(document).on('click', '#btnFlightsLink', () => {
-         $(chatBody).append(`
-            <div class="chat-messenger__content content-right content-user">
-               <div class="chat-messenger__content__container">
-                  <div class="chat-messenger__avatar">
-                     <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png'
-                        class="img-fluid border-radius-full" alt="avatar" />
-                  </div>
-                  <div class="chat-messenger__holder">
-                     <div class="chat-messenger__text">Flights.</div>
-                     <div class="chat-messenger__statusbar">
-                     <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                     <span class="chat-messenger__status readed"></span>
-                 </div> 
-                  </div>
-               </div>
-            </div>
-         `);
-
-         $(chatBody).append(`
-            <div class="chat-messenger__content content-left content-admin">
-               <div class="chat-messenger__content__container">
-                  <div class="chat-messenger__avatar">
-                     <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                        class="img-fluid border-radius-full" alt="avatar" />
-                  </div>
-                  <div class="chat-messenger__holder">
-                     <div class="chat-messenger__text">Click button to search for flights.</div>
-                     <div class="chat-messenger__statusbar">
-                     <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                     <span class="chat-messenger__status"></span>
-                 </div> 
-                  </div>
-               </div>
-               <div class="chat-messenger__content__action">
-                  <button id="btnFlightsSearch" class="btn btn-fluid btn-primary">Search</button>
-               </div>
-            </div>
-         `);
-
-         ChatBodyScrollTo();
-      });
-
-      ///////////////////////////////////////////////////VILLAGE/////////////////////////////////////////////////////
-      $(document).on('click', '#btnSocialTour', () => {
-         var msgID = uid();
-
-         $('#chatBody').append(`
-            <div class="chat-messenger__content content-right content-user" id='${msgID}'>
-               <div class="chat-messenger__content__container">
-                  <div class="chat-messenger__avatar">
-                     <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png'
-                        class="img-fluid border-radius-full" alt="avatar" />
-                  </div>
-                  <div class="chat-messenger__holder">
-                     <div class="chat-messenger__text">Social Tour.</div>
-                     <div class="chat-messenger__statusbar">
-                     <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                     <span class="chat-messenger__status sending"></span>
-               </div>    
-                  </div>
-               </div>
-            </div>
-         `);
-
-         $('#chatBody').append(`
-            <div class="chat-messenger__content content-left content-admin">
-               <div class="chat-messenger__content__container">
-                  <div class="chat-messenger__avatar">
-                     <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                        class="img-fluid border-radius-full" alt="avatar" />
-                  </div>
-                  <div class="chat-messenger__holder">
-                     <div class="chat-messenger__text">Click button to search for social tours.</div>
-                     <div class="chat-messenger__statusbar">
-                     <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                     <span class="chat-messenger__status"></span>
-                  </div> 
-                  </div>
-               </div>
-               <div class="chat-messenger__content__action">
-                  <a href="/social-tours"><button id="btnTransferSearch" class="btn btn-fluid btn-primary">Search</button></a>
-               </div>
-            </div>
-         `);
-
-         ChatBodyScrollTo();
-      });
-
-
-
-      ///////////////////////////////////////////////////TRANSFER/////////////////////////////////////////////////////
-      $(document).on('click', '#btnTransfer', () => {
-
-         var msgID = uid();
-
-         $('#chatBody').append(`
-            <div class="chat-messenger__content content-right content-user" id='${msgID}'>
-               <div class="chat-messenger__content__container">
-                  <div class="chat-messenger__avatar">
-                     <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png'
-                        class="img-fluid border-radius-full" alt="avatar" />
-                  </div>
-                  <div class="chat-messenger__holder">
-                     <div class="chat-messenger__text">Transfer.</div>
-                     <div class="chat-messenger__statusbar">
-                     <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                     <span class="chat-messenger__status sending"></span>
-               </div>    
-                  </div>
-               </div>
-            </div>
-         `);
-
-         $('#chatBody').append(`
-            <div class="chat-messenger__content content-left content-admin">
-               <div class="chat-messenger__content__container">
-                  <div class="chat-messenger__avatar">
-                     <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                        class="img-fluid border-radius-full" alt="avatar" />
-                  </div>
-                  <div class="chat-messenger__holder">
-                     <div class="chat-messenger__text">Click button to search for transfer.</div>
-                     <div class="chat-messenger__statusbar">
-                     <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                     <span class="chat-messenger__status"></span>
-                  </div> 
-                  </div>
-               </div>
-               <div class="chat-messenger__content__action">
-                  <button id="btnTransferSearch" class="btn btn-fluid btn-primary">Search</button>
-               </div>
-            </div>
-         `);
-
-         ChatBodyScrollTo();
-
-         if (socketState !== null) {
-            var message = {
-               msgID: msgID,
-               role: 1,
-               type: 0,
-               target: "message",
-               body: 'Transfer.'
-            }
-            chatStore.current.push(message);
-            localStorage.setItem('store', JSON.stringify(chatStore.current));
-            sendMessage(message)
-            socketState.current.send(new TextEncoder().encode(JSON.stringify(message)));
-         }
-
-      });
-      
-         // Устанавливаем флаг, что сообщение было показано
-         setIsInitialMessageShown(true);
-       }
-
-   }, [isInitialMessageShown]);
 
    const handleHotelsSearch = () => {
       const queryParams = new URLSearchParams();
@@ -416,55 +242,12 @@ const ChatUser = () => {
       return event;
    }
 
-   setInterval(() => {
-      if (socketState.current !== null) {
-         if (socketState.current.readyState === 1) {
-            Observer();
-         }
-      }
-   }, 2000);
-
-   ///Observer
-   function Observer() {
-      if (socketState.current !== null) {
-         if (socketState.current.readyState === 1) {
-            if (chatStore.current !== null) {
-               for (var i = 0; i < chatStore.current.length; i++) {
-                  CheckMessageStatus(chatStore.current.pop().msgID);
-               }
-            }
-         }
-      }
-   }
-
-   function CheckMessageStatus(msgID) {
-      if (socketState.current.readyState !== null) {
-         if (socketState.current.readyState === 1) {
-            var message = {
-               msgID: msgID,
-               target: 'chk_msg_status'
-            }
-            socketState.current.send(new TextEncoder().encode(JSON.stringify(message)));
-         }
-      }
-   }
-
-
-   ////////////////////////////////////SEND MESSAGE FROM INPUT///////////////////////////////
-   $(document).on('click', '#send-message-btn', () => {
-      if ($('#messageText').val().trim() !== '') {
-         setBtnSendMessage(true);
-      }
-   });
-
    $(document).on('click', '#reserve_budget_hotel_btn', () => {
       setModalContent('budget-room-reserve')
    })
 
 
    const sendMessageHandleKeyPress = (e) => {
-
-
       if ($('#messageText').val().trim() === '') {
          document.querySelector('textarea').style.height = '44px'
       }
@@ -472,6 +255,7 @@ const ChatUser = () => {
       if (e.keyCode === 13 && !e.shiftKey) {
          if ($('#messageText').val().trim() !== '') {
             setBtnSendMessage(true);
+            sendMessage(newMessage);
          }
          e.preventDefault();
       }
@@ -481,7 +265,6 @@ const ChatUser = () => {
             document.querySelector('textarea').style.height = '60px'
          }
       }
-
    }
 
    const sendMessageHandleKeyUp = (e) => {
@@ -497,7 +280,6 @@ const ChatUser = () => {
    }
    
    function GetUserChatsMessages() {
-      setInitSocket(true);
       if (messages.length > 0) {
          for (var i = 0; i < messages.length; i++) {
             var appendText = '';
@@ -701,7 +483,6 @@ const ChatUser = () => {
 
          socket.onopen = () => {
             socketState.current = socket;
-            setInitSocket(true);
             if (localStorage.getItem('store') !== null) {
                chatStore.current = JSON.parse(localStorage.getItem('store'));
                if (chatStore.current.length > 0) {
@@ -928,16 +709,6 @@ const ChatUser = () => {
       }
    }
 
-   useEffect(() => {
-      setInterval(() => {
-         if (socketState.current !== null) {
-            if (socketState.current.readyState === 1) {
-               socketState.current.send(new TextEncoder().encode(JSON.stringify({ target: 'ping' })));
-            }
-         }
-      }, 10000);
-   }, []);
-
    function Message(message) {
       if (message.target === 'message') {
          if (message.role === 1) {
@@ -967,47 +738,8 @@ const ChatUser = () => {
 
    useEffect(() => {
       if (btnSendMessage !== false) {
-         var msgID = uid();
-         const messageTemp = userMessage.replace(/(\r\n|\r|\n)/g, '<br/>');
-         var appendText = `
-         <div class="chat-messenger__content content-right content-user" id='${msgID}'>
-            <div class="chat-messenger__content__container">
-               <div class="chat-messenger__avatar">
-                  <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png'
-                     class="img-fluid border-radius-full" alt="avatar" />
-               </div>
-               <div class="chat-messenger__holder">
-                  <div class="chat-messenger__text">${messageTemp}</div>
-                  <div class="chat-messenger__statusbar">
-                  <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                  <span class="chat-messenger__status sending"></span>
-              </div>    
-               </div>
-            </div>
-         </div>
-      `
-         // $("#chatBody").append(appendText);
-         if (socketState !== null) {
-            if (appendText !== undefined) {
-               var message = {
-                  msgID: msgID,
-                  role: 0,
-                  type: 0,
-                  target: "message",
-                  body: messageTemp
-               }
-               chatStore.current.push(message);
-               localStorage.setItem('store', JSON.stringify(chatStore.current));
-               sendMessage(message)
-               if (socketState.current !== null) {
-                  if (socketState.current.readyState === 1) {
-                     socketState.current.send(new TextEncoder().encode(JSON.stringify(message)));
-                  }
-               }
-            }
-         }
          $('#messageText').val('');
-         setUserMessage('');
+         setNewMessage('')
          setInputBarActive(false);
          setBtnSendMessage(false);
          ChatBodyScrollTo();
@@ -1023,6 +755,10 @@ const ChatUser = () => {
    /////////////////////////////////////////////SEARCH Transfer BUTTON ON CLICKS FUNCTION////////////////////////////////////////////
    $(document).on('click', '#btnTransferSearch', () => {
       // setModalContent('transfer-details');
+   });
+
+   $(document).on('click', '#btnSocialTourSearch', () => {
+      window.location.href = '/social-tours'
    });
 
    ////////////////////////////////////////////ADD ANOTHER PASSENGER//////////////////////////////////////////
@@ -1191,95 +927,27 @@ const ChatUser = () => {
 
 
       if ((window.innerWidth >= 504 && fromInput1 !== "") || (window.innerWidth < 504 && fromInput2 !== "")) {
-         if ((value[1] === null && flightDirection === 'One way') || (value[1] !== null && flightDirection === 'Return')) {
-            if (socketState !== null) {
-               var msgID = uid();
-               var messageBody = `<div class="info-list">
-                        <span class="info-list__title">Flight search</span>
-                        <span class="info-list__item">${flightDirection} / ${flightClasses} class</span>
-                        <span class="info-list__item"> ${GuestCountCalc()} </span>
-                        <span class="info-list__item">From: ${$('.from-input').val()}</span>
-                        <span class="info-list__item">To: Baku (GYD)</span>
-                        <span class="info-list__item">Departure: ${new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[0]))}</span>
-                        <span class="info-list__item">Return: ${value[1] !== null ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[1])) : 'No Return'}</span>
-                  </div>`;
-               var appendText = `
-                  <div class="chat-messenger__content content-right content-user" id='${msgID}'>
-                     <div class="chat-messenger__content__container">
-                        <div class="chat-messenger__avatar">
-                           <img src="${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png"
-                                 class="img-fluid border-radius-full" alt="avatar">
-                        </div>
-                        <div class="chat-messenger__holder">
-                           ${messageBody}
-                           <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                        </div>
-                     </div>
-                  </div>
-               `;
-
-               var message = {
-                  msgID: msgID,
-                  role: 0,
-                  type: 0,
-                  target: "message",
-                  // body: messageBody,
-                  body: '',
-                  items: [
-                     `${flightDirection} / ${flightClasses} class`,
-                     `${GuestCountCalc()}`,
-                     `From: ${fromInput1}`,
-                     `To: Baku (GYD)`,
-                     `Departure: ${new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[0]))}`,
-                     `Return: ${value[1] !== null ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[1])) : 'No Return'}`
-                 ],
-               }
-               chatStore.current.push(message);
-               localStorage.setItem('store', JSON.stringify(chatStore.current));
-               sendMessage(message)
-               if (socketState.current !== null) {
-                  if (socketState.current.readyState === 1) {
-                     socketState.current.send(new TextEncoder().encode(JSON.stringify(message)));
-                  }
-               }
-
-               // $('#chatBody').append(appendText);
+         if ((value[1] === null && flightDirection === 'One way') || (value[1] !== null && flightDirection === 'Return')) {   
+            const flightDetails = [
+               `${flightDirection} / ${flightClasses} class`,
+               `${GuestCountCalc()}`,
+               `From: ${fromInput1 || fromInput2}`,
+               `To: Baku (GYD)`,
+               `Departure: ${new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[0]))}`,
+               `Return: ${value[1] !== null ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[1])) : 'No Return'}`
+            ];
+      
+            sendMessage(JSON.stringify(flightDetails), 'form');
+            ChatBodyScrollTo();
+      
+            setTimeout(() => {
+               sendMessage('Thank you for your request. We will reply to you as soon as possible.', 'message', { sender: 'admin' });
                ChatBodyScrollTo();
-               setTimeout(() => {
-
-                  message.msgID = uid();
-                  message.type = 0;
-                  message.target = "#autoReply"
-                  message.role = 0;
-                  message.body = '';
-
-
-                  $('#chatBody').append(`
-                  <div class="chat-messenger__content content-left content-admin" id='${message.msgID}'>
-                     <div class="chat-messenger__content__container">
-                        <div class="chat-messenger__avatar">
-                           <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                              class="img-fluid border-radius-full" alt="avatar" />
-                        </div>
-                        <div class="chat-messenger__holder">
-                           <div class="chat-messenger__text">Thank you for your request.
-                           We will reply to you as soon as possible.</div>
-                           <div class="chat-messenger__statusbar">
-                           <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                       </div>    
-                        </div>
-                     </div>                
-                  </div>
-               `);
-
-                  chatStore.current.push(message);
-                  localStorage.setItem('store', JSON.stringify(chatStore.current));
-                  socketState.current?.send(JSON.stringify(message));
-                  ChatBodyScrollTo();
-               }, 1000);
-               setModalContent(null);
-            }
+            }, 1000);
+      
+            setModalContent(null);
          }
+         
       }
    }
 
@@ -1983,7 +1651,44 @@ const ChatUser = () => {
                         <div className="chat-messenger__body__nickname">Monki</div>
                         <div className="chat-messenger__body__joined">Monki joined the chat</div>
                      <div className="chat-messenger__body" id="chatBody">
-                        <MessageList messages={messages} />
+                     <div className="chat-messenger__content content-left content-admin">
+                           <div className="chat-messenger__content__container">
+                              <div className="chat-messenger__avatar">
+                              <img src={`${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png`}
+                                 className="img-fluid border-radius-full" alt="avatar" />
+                              </div>
+                              <div className="chat-messenger__holder">
+                              <div className="chat-messenger__text">Hi, <br /> I’m Monki! How can I help you?</div>
+                              <div className="chat-messenger__statusbar">
+                                 <span className="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
+                                 <span className="chat-messenger__status"></span>
+                              </div> 
+                              </div>
+                           </div>
+                           <div className="chat-messenger__content__action">
+                              <div className="btn-group">
+                                 {buttons.map(({id, key, label}) => (
+                                    <button
+                                    key={id}
+                                    id={id}
+                                    className="btn btn-outline btn-outline-sm btn-outline-primary"
+                                    style={{ margin: 0, padding: "10px 0", minWidth: "91px" }}
+                                    onClick={() => {
+                                       sendMessage(key, 'message', { key })
+                                    }}
+                                    >
+                                    {label}
+                                    </button>
+                                 ))}
+                              </div>
+                              <div className="chat-messenger__content__info">
+                              For group booking, please contact
+                              <br />
+                              <a href="mailto:hospitality@iac2023.org" className="link">hospitality@iac2023.org</a>
+                              </div>
+                           </div>
+                        </div>
+                        <MessageList messages={messages} user={currentUser?.userId} sendMessage={sendMessage}/>
                      </div>
                      <div className="chat-messenger__footer">
                         {/* <div className="chat-messenger__footer__action">
@@ -1991,11 +1696,24 @@ const ChatUser = () => {
                         </div> */}
                         <div className="chat-messenger__footer__form">
                            <div className="form-field has-icon">
-                              <textarea id='messageText' type="text" className="form-control" placeholder="Type your message" onChange={(e) => sendMessageHandleChange(e)} onKeyDown={(e) => sendMessageHandleKeyPress(e)} onKeyUp={(e) => sendMessageHandleKeyUp(e)} />
+                              <textarea id='messageText' 
+                                 type="text" 
+                                 className="form-control"
+                                 value={newMessage} 
+                                 placeholder="Type your message" 
+                                 onChange={(e) => sendMessageHandleChange(e)} 
+                                 onKeyDown={(e) => sendMessageHandleKeyPress(e)} 
+                                 onKeyUp={(e) => sendMessageHandleKeyUp(e)} />
                               <button className="chat-messenger__btn icon-send" id='send-message-btn' style={{
                                  backgroundColor: inputBarActive === true ? '#274DE0' : 'transparent',
                                  color: inputBarActive === true ? '#fff' : '#101010'
-                              }}></button>
+                              }}
+                              onClick={() => {
+                                 if (newMessage.trim()) {
+                                   sendMessage(newMessage);
+                                   setNewMessage('');
+                                 }
+                               }}></button>
                            </div>
                         </div>
                      </div>
@@ -2008,7 +1726,7 @@ const ChatUser = () => {
          {/* <!-- Begin  :: Search Flight --> */}
          <div className={modalContent === 'flight-details' ? 'modal show' : 'modal'} id="modal-search-flights"
             style={{ cursor: 'pointer' }}
-         // onClick={() => setModalContent(null)}
+            // onClick={() => setModalContent(null)}
          >
             <div className="modal-container" data-size="sm" style={{ cursor: 'auto', background: 'white', padding: '32px 24px', borderRadius: '20px 20px 0 0' }}>
                <div className="modal-layout">
