@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ref, push, onValue, set, update } from 'firebase/database';
+import { ref, push, onValue, set, update, remove } from 'firebase/database';
 import { db } from '../../firebase';
 import './chatuser.scss';
 import '../../assets_concierge/styles/main.css';
@@ -199,6 +199,13 @@ const ChatUser = () => {
          sendAdminResponse(lastMessage);
        }
      }, [messages, sendAdminResponse]);
+
+     const deleteMessage = async (messageId) => {
+      if (currentUser?.userId) {
+        const messageRef = ref(db, `chats/${currentUser?.userId}/messages/${messageId}`);
+        await remove(messageRef);
+      }
+    };
 
    //////TRANFER DETAILS PASSENGER NUMBER HANDLE CHANGE
    const tranferPassengerHandleChange = (event) => {
@@ -476,6 +483,43 @@ const ChatUser = () => {
                               `
       );
    }
+
+   const sendPriceDetailsSubmitHandler = (amount) => {
+      const formMessages = JSON.parse(localStorage.getItem(`flights_${currentUser?.userId}`)) || [];
+
+      if (formMessages.length === 0) {
+         sendMessage("There is no flight data. Please enter flight details.", 'button_click', {key: 'btnFlightsSearch', sender: 'admin'})
+         return;
+      }
+
+      $.ajax({
+         method: "POST",
+         url: `${baseURL}/app/v1/payment/iac`,
+         data: JSON.stringify({
+            book_type: "FLIGHT",
+            currency: "USD",
+            amount: amount,
+            flights: [formMessages]
+         }),
+         dataType: "json",
+         headers: {
+            "x-auth-key": token,
+            "content-type": "application/json",
+         },
+         success: (content) => {
+            if (content.result?.status && content.data) {
+            window.location.href = content.data;
+            localStorage.removeItem(`flights_${currentUser?.userId}`);
+            } else {
+            sendMessage('Failed to create a payment session. Please try again.', {sender: 'admin'})
+            }
+         },
+         error: (xhr, status, error) => {
+            console.error(error);
+            sendMessage('An error occurred while sending the request. Please try again later', {sender: 'admin'})
+         }
+      });  
+     };
 
    function InitialChatSocket() {
       try {
@@ -928,16 +972,18 @@ const ChatUser = () => {
 
       if ((window.innerWidth >= 504 && fromInput1 !== "") || (window.innerWidth < 504 && fromInput2 !== "")) {
          if ((value[1] === null && flightDirection === 'One way') || (value[1] !== null && flightDirection === 'Return')) {   
-            const flightDetails = [
-               `${flightDirection} / ${flightClasses} class`,
-               `${GuestCountCalc()}`,
-               `From: ${fromInput1 || fromInput2}`,
-               `To: Baku (GYD)`,
-               `Departure: ${new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[0]))}`,
-               `Return: ${value[1] !== null ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value[1])) : 'No Return'}`
-            ];
-      
-            sendMessage(JSON.stringify(flightDetails), 'form');
+            const newFlight = {
+               from_city: fromInput1 || fromInput2,
+               to_city: "Baku (GYD)",
+               departure_date: new Date(value[0]).toISOString().split('T')[0],
+               return_date: value[1] !== null ? new Date(value[1]).toISOString().split('T')[0] : null,
+               flight_type: flightClasses,
+               flight_direction: flightDirection,
+               adults_count: flightAdultNumber || 0,
+               children_count: flightChildrenNumber || 0,
+               infants_count: flightInfantsNumber || 0,
+            };
+            sendMessage(JSON.stringify(newFlight), 'form');
             ChatBodyScrollTo();
       
             setTimeout(() => {
@@ -1351,8 +1397,8 @@ const ChatUser = () => {
 
          }
 
-         if (socketState !== null) {
-            if (socketState.current.readyState === 1) {
+         // if (socketState !== null) {
+         //    if (socketState.current.readyState === 1) {
                var msgID = uid();
                var appendText = '';
                var msgForSever = `
@@ -1393,7 +1439,6 @@ const ChatUser = () => {
                ChatBodyScrollTo();
                chatStore.current.push(message);
                localStorage.setItem('store', JSON.stringify(chatStore.current));
-               sendMessage(message)
                if (socketState.current !== null) {
                   if (socketState.current.readyState === 1) {
                      socketState.current.send(new TextEncoder().encode(JSON.stringify(message)));
@@ -1460,14 +1505,10 @@ const ChatUser = () => {
                   ChatBodyScrollTo();
                   chatStore.current.push(message);
                   localStorage.setItem('store', JSON.stringify(chatStore.current));
-                  sendMessage(message)
-                  if (socketState.current !== null) {
-                     if (socketState.current.readyState === 1) {
-                        socketState.current.send(new TextEncoder().encode(JSON.stringify(message)));
-                     }
-                  }
-               }
-            }
+                  // sendMessage(message)
+                 
+            //    }
+            // }
          }
          setModalContent(null);
       }
@@ -1688,7 +1729,7 @@ const ChatUser = () => {
                               </div>
                            </div>
                         </div>
-                        <MessageList messages={messages} user={currentUser?.userId} sendMessage={sendMessage}/>
+                        <MessageList messages={messages} user={currentUser?.userId} sendMessage={sendMessage} handlePayment={sendPriceDetailsSubmitHandler} handledeleteMessage={deleteMessage}/>
                      </div>
                      <div className="chat-messenger__footer">
                         {/* <div className="chat-messenger__footer__action">

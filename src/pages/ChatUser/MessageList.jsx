@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { ref, remove } from "firebase/database";
+import { db } from '../../firebase';
 
 const buttons = [
   { id: "btnHotelsSearch", label: "Hotels", key: "Hotels" },
@@ -6,7 +8,7 @@ const buttons = [
   { id: "btnSocialTourSearch", label: "Social Tour", key: "Tours" },
 ];
 
-const MessageList = ({ messages, user, sendMessage }) => {
+const MessageList = ({ messages, user, sendMessage, handlePayment, handledeleteMessage }) => {
   useEffect(() => {
     ChatBodyScrollTo();
   }, [messages]);
@@ -24,13 +26,15 @@ const MessageList = ({ messages, user, sendMessage }) => {
           message={message}
           user={user}
           sendMessage={sendMessage}
+          handlePayment={handlePayment}
+          handledeleteMessage={handledeleteMessage}
         />
       ))}
     </div>
   );
 };
 
-const MessageItem = ({ message, user, sendMessage }) => {
+const MessageItem = ({ message, user, sendMessage, handlePayment, handledeleteMessage }) => {
   const isAdmin = message.sender === "admin";
   const messageClass =
     isAdmin && user
@@ -62,6 +66,35 @@ const MessageItem = ({ message, user, sendMessage }) => {
     }
   };
 
+  function GuestCountCalc(flightAdultNumber, flightChildrenNumber, flightInfantsNumber) {
+    var guestCount = flightAdultNumber + flightChildrenNumber + flightInfantsNumber;
+    var guestCountStr = '';
+
+    if (guestCount > 1) {
+
+       if (flightAdultNumber > 1)
+          guestCountStr += `${flightAdultNumber} Adults`
+       else {
+          guestCountStr += `${flightAdultNumber} Adult`
+       }
+       if (flightChildrenNumber > 0)
+          guestCountStr += `, ${flightChildrenNumber} Children`
+
+
+       if (flightInfantsNumber > 1)
+          guestCountStr += `, ${flightInfantsNumber} Infants`
+
+       if (flightInfantsNumber === 1)
+          guestCountStr += `, ${flightInfantsNumber} Infant`
+    }
+    else {
+       guestCountStr += `${flightAdultNumber} Adult`
+    }
+
+
+    return guestCountStr;
+ }
+
   const renderMessageContent = () => {
     switch (message.type) {
       case "pay_status":
@@ -78,7 +111,6 @@ const MessageItem = ({ message, user, sendMessage }) => {
         );
 
       case "pay_link":
-        const payLink = JSON.parse(message.text);
         return (
           <div
             className={`chat-messenger__content ${messageClass}`}
@@ -87,7 +119,7 @@ const MessageItem = ({ message, user, sendMessage }) => {
             <div className="chat-messenger__content__container">
               <div className="chat-messenger__avatar">
                 <img
-                  src={`${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png`}
+                  src={avatarSrc}
                   className="img-fluid border-radius-full"
                   alt="avatar"
                 />
@@ -97,49 +129,53 @@ const MessageItem = ({ message, user, sendMessage }) => {
                   className="chat-messenger__text"
                   style={{
                     width: "100%",
-                    display: "flexbox",
+                    display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
                   }}
                 >
-                  Click the button to pay
-                  <div
+                  {message.text}
+                  {isAdmin && !user && <div
                     className="remove-admin-message-btn"
                     style={{ cursor: "pointer" }}
+                    onClick={() => handledeleteMessage(message.id)}
                   >
                     <img
                       src={`${process.env.PUBLIC_URL}/images_concierge/other/icon/x.svg`}
                       alt="avatar"
                     />
-                  </div>
+                  </div>}
                 </div>
                 <span className="chat-messenger__price">
-                  Price: $${payLink.amount}
+                  Price: $ {message.amount}
                 </span>
                 <div className="chat-messenger__statusbar">
                   <span className="chat-messenger__date">
-                    $
                     {new Intl.DateTimeFormat("en-US", {
                       hour: "numeric",
                       minute: "numeric",
                     }).format(new Date(Date.now()))}
                   </span>
-                  <span
-                    className={`chat-messenger__status ${
-                      message.isRead ? "readed" : "sended"
-                    }`}
-                  ></span>
+                  {(user && !isAdmin && message.sender !== "admin") ||
+                  (isAdmin && !user && message.sender === "admin") ? (
+                    <span
+                      className={`chat-messenger__status ${MessageStatus(
+                        message
+                      )}`}
+                    ></span>
+                  ) : null}
                 </div>
               </div>
             </div>
             <div
               className="chat-messenger__content__action"
-              style={{ marginRight: "64px" }}
+              style={inlineStyles}
             >
               <a
-                href={payLink.url}
+                href='#'
                 className="btn btn-fluid btn-primary"
                 data-modal="modal-pay"
+                onClick={() => handlePayment(message.amount)}
               >
                 Pay
               </a>
@@ -288,6 +324,11 @@ const MessageItem = ({ message, user, sendMessage }) => {
 
       default:
         const parsedData = message.type === "form" && JSON.parse(message.text);
+        const chatId = message.sender;
+
+        if (parsedData && chatId) {
+          localStorage.setItem(`flights_${chatId}`, JSON.stringify(parsedData));
+        }
         return (
           <div
             className={`chat-messenger__content ${messageClass}`}
@@ -303,12 +344,20 @@ const MessageItem = ({ message, user, sendMessage }) => {
               </div>
               <div className="chat-messenger__holder">
                 {parsedData ? (
-                  parsedData.map((item, index) => (
-                    <span key={index} className="info-list__item">
-                      {item}
-                    </span>
-                  ))
-                ) : (
+                 
+                    <><span className="info-list__item">
+                    {parsedData.flight_direction} / {parsedData.flight_type} class
+                  </span><span className="info-list__item">
+                      {GuestCountCalc(parsedData.adults_count, parsedData.children_count, parsedData.infants_count)}
+                    </span><span className="info-list__item">
+                      From: {parsedData.from_city}
+                    </span><span className="info-list__item">
+                      To: Baku (GYD)
+                    </span><span className="info-list__item">
+                      Departure: {parsedData.departure_date}
+                    </span><span className="info-list__item">
+                      Return: {parsedData.return_date}
+                    </span></>) : (
                   <div
                     className="chat-messenger__text"
                     style={{
@@ -324,6 +373,7 @@ const MessageItem = ({ message, user, sendMessage }) => {
                       <div
                         className="remove-admin-message-btn"
                         style={{ cursor: "pointer" }}
+                        onClick={() => handledeleteMessage(message.id)}
                       >
                         <img
                           src={`${process.env.PUBLIC_URL}/images_concierge/other/icon/x.svg`}

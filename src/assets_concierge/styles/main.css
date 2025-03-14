@@ -5622,6 +5622,7 @@ template {
   padding: 12px 24px;
   background: #E9EDFC;
   border-radius: 100px;
+  text-align: center;
 }
 
 .chat-messenger__getStart__text span {

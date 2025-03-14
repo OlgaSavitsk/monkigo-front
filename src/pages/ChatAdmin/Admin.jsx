@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ref, push, onValue, set, update } from "firebase/database";
+import { ref, push, onValue, set, update, remove } from "firebase/database";
 import { db } from "../../firebase";
 import "./chatadmin.scss";
 
@@ -79,6 +79,8 @@ const Admin = () => {
           }
 
           set(ref(db, `chats/${selectedChat}/unreadCount`), 0);
+        } else {
+         setMessages([]);
         }
       });
 
@@ -90,7 +92,7 @@ const Admin = () => {
     if (selectedChat) {
          const messagesRef = ref(db, `chats/${selectedChat}/messages`);
       
-         const messageData = {
+         let messageData = {
             text,
             sender: "admin",
             timestamp: Date.now(),
@@ -99,7 +101,10 @@ const Admin = () => {
          };
 
          if (props) {
-            messageData.key = props; 
+            messageData = {
+              ...messageData,
+              ...props
+            }; 
          }
 
          push(messagesRef, messageData);
@@ -208,13 +213,10 @@ const Admin = () => {
   };
 
   const sendPassportDetailsButtons = () => {
-    // chatStore.current.push(message);
-    // localStorage.setItem('store', JSON.stringify(chatStore.current));
     sendMessage(
       "Click button to search for passport details.",
       "passport_details"
     );
-    // ChatBodyScrollTo();
   };
   const sendMainButtons = () => {
     sendMessage("Click button to search for passport details.", "main_link");
@@ -227,93 +229,28 @@ const Admin = () => {
       if (validatePrice($("#send-price-details-input").val())) {
         $("#send-price-details-input").css("border", "1px solid #e5e5e5");
 
-        $.ajax({
-          method: "POST",
-          url: `${baseURL}/app/v1/payment/iac`,
-          data: {
-            chk: localStorage.getItem("chk"),
-            total: $("#send-price-details-input").val(),
-          },
-          dataType: "json",
-          headers: {
-            "x-auth-key": localStorage.getItem("token"),
-            "content-type": "application/json",
-          },
-          // JSON.stringify(bookingPayload)
-          success: (content) => {
-            if (content.result.status) {
-              var msgID = uid();
-              var appendText = `
-                   <div class="chat-messenger__content content-right content-admin" id='${msgID}'>
-                      <div class="chat-messenger__content__container">
-                         <div class="chat-messenger__avatar">
-                               <img src="${
-                                 process.env.PUBLIC_URL
-                               }/images_concierge/template/avatar/admin-avatar.png"
-                                  class="img-fluid border-radius-full" alt="avatar">
-                         </div>
-                         <div class="chat-messenger__holder">
-                               <div class="chat-messenger__text" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-                                  Click the button to pay
-                                  <div class="remove-admin-message-btn" style="cursor: pointer;">
-                                     <img src='${process.env.PUBLIC_URL}/images_concierge/other/icon/x.svg'/>
-                                  </div>
-                               </div>
-                               <span class="chat-messenger__price">Price: $${$(
-                                 "#send-price-details-input"
-                               ).val()}</span>
-                               <div class="chat-messenger__statusbar">
-                                  <span class="chat-messenger__date">${new Intl.DateTimeFormat(
-                                    "en-US",
-                                    { hour: "numeric", minute: "numeric" }
-                                  ).format(new Date(Date.now()))}</span>
-                                  <span class="chat-messenger__status sending"></span>
-                              </div>                                  
-                         </div>
-                      </div>
-                      <div class="chat-messenger__content__action" style="margin-right:64px;margin-left:auto;">
-                         <a href="https://monkigo.com/app/v1/payments/v2/pay?token=${localStorage.getItem(
-                           "token"
-                         )}&source=iac&target=card&type=1&data=${
-                content.data.id
-              }" class="btn btn-fluid btn-primary" data-modal="modal-pay">Pay</a>
-                      </div>
-                   </div>
-                   `;
-              var payLink = {
-                amount: $("#send-price-details-input").val(),
-                url: `https://monkigo.com/app/v1/payments/v2/pay?token=${localStorage.getItem(
-                  "token"
-                )}&source=iac&target=card&type=1&data=${content.data.id}`,
-              };
-              var message = {
-                msgID: msgID,
-                role: 1,
-                type: 1,
-                target: "pay_link",
-                body: JSON.stringify(payLink),
-              };
-            }
-            $("#chatBody").append(appendText);
-            sendMessage(JSON.stringify(payLink), "pay_link");
-            ChatBodyScrollTo();
-            setPaymentDetailsModal(false);
+      sendMessage('Click the button to pay', "pay_link", {amount: $("#send-price-details-input").val()});
+      ChatBodyScrollTo();
+      setPaymentDetailsModal(false);
 
-            $("#send-price-details-input").val("");
-          },
-        });
-
-        //   ChatBodyScrollTo();
+      $("#send-price-details-input").val("");
       } else {
         $("#send-price-details-input").css("border", "1px solid #d32f2f");
       }
     }
   };
 
-  function ChatBodyScrollTo() {
+  const ChatBodyScrollTo = () => {
     var chatBody = document.querySelector("#chatBody");
     chatBody.scrollTop = chatBody.scrollHeight;
   }
+
+  const deleteMessage = async (messageId) => {
+    if (selectedChat) {
+      const messageRef = ref(db, `chats/${selectedChat}/messages/${messageId}`);
+      await remove(messageRef);
+    }
+  };
 
   return (
     <section
@@ -430,9 +367,12 @@ const Admin = () => {
                     onClick={() => setSideBarToggle(true)}
                   ></span>
                 </div>
-                {selectedChat && (
-                  <MessageList messages={Object.values(messages)} />
-                )}
+                {messages.length ? (
+                  <MessageList messages={Object.values(messages)} handledeleteMessage={deleteMessage}/>
+                ) : 
+                <div className="chat-messenger__getStart__text">
+                <span>No messages.</span>
+              </div>}
               </div>
               <div className="chat-messenger__getStart__text">
                 <span>Select a chat to start messaging.</span>
