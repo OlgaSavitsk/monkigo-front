@@ -18,6 +18,7 @@ import SocialTours from './pages/SocialTours/SocialTours';
 import SingleTour from './pages/SingleTour/SingleTour';
 import TourCheckout from './pages/TourCheckout/TourCheckout';
 import TourPaymentStatus from './pages/PaymentStatusTour/PaymentStatusTour';
+import Admin from './pages/ChatAdmin/Admin';
 
 function App() {
 
@@ -61,7 +62,7 @@ function App() {
         <Routes>
           <Route 
                 path='/admin' 
-                element={GetRole() ? <ChatAdmin /> : <Navigate to="/chat" replace />} 
+                element={GetRole() ? <Admin /> : <Navigate to="/chat" replace />} 
             />
             <Route 
                 path='/chat' 
