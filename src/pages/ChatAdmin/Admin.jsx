@@ -10,9 +10,6 @@ import { uid } from "uid";
 ////IMPORT IMAGES
 import Logo from "../../assets_concierge/images/logo/logo.svg";
 import LogoIAC from "../../../src/assets/navbar-second/logo-iac2023.svg";
-import useId from "@mui/material/utils/useId";
-import { useChat } from "../ChatUser/hooks/useChat";
-import ChatList from "./ChatList";
 import MessageList from "../ChatUser/MessageList";
 import { config } from "../../config";
 
@@ -56,7 +53,6 @@ const Admin = () => {
   }, [setChatRooms]);
 
   useEffect(() => {
-    if (selectedChat) {
       const messagesRef = ref(db, `chats/${selectedChat}/messages`);
       const unsubscribe = onValue(messagesRef, (snapshot) => {
         const data = snapshot.val();
@@ -70,22 +66,20 @@ const Admin = () => {
           const updates = {};
           messageList.forEach((msg) => {
             if (msg.sender !== "admin" && msg.status === "sent") {
-              updates[`chats/${selectedChat}/messages/${msg.id}/status`] =
-                "delivered";
+              updates[`chats/${selectedChat}/messages/${msg.id}/status`] = "delivered"
             }
           });
+          set(ref(db, `chats/${selectedChat}/unreadCount`), 0);
+
           if (Object.keys(updates).length > 0) {
             update(ref(db), updates);
           }
-
-          set(ref(db, `chats/${selectedChat}/unreadCount`), 0);
         } else {
          setMessages([]);
         }
       });
 
       return () => unsubscribe();
-    }
   }, [selectedChat, setMessages]);
 
   const sendMessage = (text, type = "text", props) => {
@@ -161,12 +155,6 @@ const Admin = () => {
 
    $('body').on('click', '#ready_to_remove', (e) => {
       $('.remove-admin-message-btn').removeAttr('id');
-
-      var message = {
-         msgID: $(e.currentTarget).parent().parent().parent().parent().attr('id'),
-         target: 'delete'
-      }
-      // handleDeleteMessage($(e.currentTarget).parent().parent().parent().parent().attr('id'))
       
    });
 }, []);
@@ -246,10 +234,19 @@ const Admin = () => {
   }
 
   const deleteMessage = async (messageId) => {
-    if (selectedChat) {
-      const messageRef = ref(db, `chats/${selectedChat}/messages/${messageId}`);
-      await remove(messageRef);
-    }
+    $(document).on('click', '.remove-admin-message-btn', (e) => {
+      $(e.currentTarget).css('background', '#FBE2E2');
+      $(e.currentTarget).find('img').attr('src', `${process.env.PUBLIC_URL}/images_concierge/other/icon/minus-black.svg`);
+      $(e.currentTarget).attr('id', 'ready_to_remove');
+   });
+
+   $('body').on('click', '#ready_to_remove', async (e) => {
+      $('.remove-admin-message-btn').removeAttr('id');    
+      if (selectedChat) {
+        const messageRef = ref(db, `chats/${selectedChat}/messages/${messageId}`);
+        await remove(messageRef);
+      }
+   });
   };
 
   return (
@@ -313,46 +310,39 @@ const Admin = () => {
           <div className="dashboard-navigation">
             {/* <ChatList activeChats={activeChats} onSelectChat={handleSelectChat} /> */}
             {chatRooms.map((room) => (
-              <>
-                <a
-                  href="#"
-                  key={room.id}
-                  id={room.id}
-                  onClick={() => {
-                     setSelectedChat(room.id)
-                     ChatBodyScrollTo()}}
-                  className={`dashboard-navigation__item ${
-                    selectedChat === room.id
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100 hover:bg-gray-200"
-                  }`}
-                >
-                  <div className="relative">
-                    {room.unreadCount > 0 && (
-                      <div className="absolute -top-2 -right-1">
-                        <div className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                          {room.unreadCount}
-                        </div>
-                      </div>
-                    )}
+              <a
+                href="#"
+                key={room.id}
+                id={room.id}
+                onClick={() => {
+                    setSelectedChat(room.id)
+                    ChatBodyScrollTo()}}
+                className={`dashboard-navigation__item ${
+                  selectedChat === room.id
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 hover:bg-gray-200"
+                }`}
+              >
+                <div className="relative">
+                {room.unreadCount > 0 && (
+                    <span className="dashboard-navigation__badge">{room.unreadCount}</span>
+                )}
+                </div>
+                <div className="text-left flex-1">
+                  <div className="dashboard-navigation__fullname">
+                    {room.name}
                   </div>
-                  <div className="text-left flex-1">
-                    <div className="dashboard-navigation__fullname">
-                      {room.name}
-                      {room.unreadCount > 0 && <p>{room.unreadCount}</p>}
-                    </div>
-                    <div className="dashboard-navigation__last-message">
-                      {room.lastMessage?.timestamp
-                        ? new Intl.DateTimeFormat("en-US", {
-                            hour: "numeric",
-                            minute: "numeric",
-                          }).format(new Date(room.lastMessage?.timestamp))
-                        : "No timestamp"}
-                      : {room.lastMessage.type === "form" ? JSON.parse(room.lastMessage?.text) : room.lastMessage?.text}
-                    </div>
+                  <div className="dashboard-navigation__last-message">
+                    {room.lastMessage?.timestamp
+                      ? new Intl.DateTimeFormat("en-US", {
+                          hour: "numeric",
+                          minute: "numeric",
+                        }).format(new Date(room.lastMessage?.timestamp))
+                      : "No timestamp"}
+                    : { room.lastMessage?.text}
                   </div>
-                </a>
-              </>
+                </div>
+              </a>
             ))}
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ref, push, onValue, set, update, remove } from 'firebase/database';
+import { ref, push, onValue, set, update, remove, runTransaction } from 'firebase/database';
 import { db } from '../../firebase';
+import { useLocation } from 'react-router-dom';
 import './chatuser.scss';
 import '../../assets_concierge/styles/main.css';
 
@@ -103,10 +104,11 @@ const ChatUser = () => {
    const [currentUser, setCurrentUser] = useState(null);
    const [ token, setToken ] = useState(null);
    const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+   const [newMessage, setNewMessage] = useState('');
 
    const socketState = useRef(null);
    const chatStore = useRef([]);
+   const location = useLocation();
    var chatDateDivider_Today = false;
    var chatDateDivider_Yesterday = false;
    var chatDateDivider_Exists = [];
@@ -129,19 +131,15 @@ const ChatUser = () => {
         }));
         setMessages(messageList);
 
-        // Mark messages as read when user views them
         const updates = {};
         messageList.forEach(msg => {
           if (msg.sender === 'admin' && msg.status !== 'read') {
-            updates[`chats/${currentUser?.userId}/messages/${msg.id}/status`] = 'read';
+            updates[`chats/${currentUser?.userId}/messages/${msg.id}/status`] = 'delivered';
           }
         });
         if (Object.keys(updates).length > 0) {
           update(ref(db), updates);
         }
-
-        // Reset unread count
-        set(ref(db, `chats/${currentUser?.userId}/unreadCount`), 0);
       }
       ChatBodyScrollTo();
     });
@@ -149,26 +147,29 @@ const ChatUser = () => {
     return () => unsubscribe();
   }, [currentUser?.userId]);
 
-  const sendMessage = (text, type = 'text', props = null) => {
-    const messagesRef = ref(db, `chats/${currentUser?.userId}/messages`);
-    const messagesRefName = ref(db, `chats/${currentUser?.userId}`);
-    let messageData = {
-      text,
-      sender: currentUser?.userId,
-      timestamp: Date.now(),
-      type,
-      status: 'sent',
-  };
-
+  const sendMessage = async (text, type = 'text', props = null) => {
+   const messagesRef = ref(db, `chats/${currentUser?.userId}/messages`);
+   const messagesRefName = ref(db, `chats/${currentUser?.userId}`);
+   const unreadCountRef = ref(db, `chats/${currentUser?.userId}/unreadCount`);
+ 
+   let messageData = {
+     text,
+     sender: currentUser?.userId,
+     timestamp: Date.now(),
+     type,
+     status: 'sent',
+   };
+ 
    if (props) {
-      messageData = {
-         ...messageData, ...props
-      }; 
+     messageData = { ...messageData, ...props };
    }
-
-   push(messagesRef, messageData);
-   update(messagesRefName, {name: `${currentUser?.firstName} ${currentUser?.lastName}`,})
-  };
+ 
+   await push(messagesRef, messageData);
+   await update(messagesRefName, { name: `${currentUser?.firstName} ${currentUser?.lastName}` });
+   await runTransaction(unreadCountRef, (currentCount) => {
+     return messageData.sender !== 'admin' ? (currentCount || 0) + 1 : (currentCount || 0);
+   });
+ };
     
    useEffect(() => {
       const { token } = JSON.parse(localStorage.getItem('user'));
@@ -193,18 +194,33 @@ const ChatUser = () => {
       }
     };
    
-     useEffect(() => {
-       const lastMessage = messages[messages.length - 1];
-       if (lastMessage) {
-         sendAdminResponse(lastMessage);
-       }
-     }, [messages, sendAdminResponse]);
+   useEffect(() => {
+      const lastMessage = messages[messages.length - 1];
 
-     const deleteMessage = async (messageId) => {
-      if (currentUser?.userId) {
-        const messageRef = ref(db, `chats/${currentUser?.userId}/messages/${messageId}`);
-        await remove(messageRef);
-      }
+      const timer = setTimeout(() => {
+          if (lastMessage) {
+              sendAdminResponse(lastMessage);
+              ChatBodyScrollTo();
+          }
+      }, 1000);
+  
+      return () => clearTimeout(timer); 
+   }, [messages, sendAdminResponse]);
+
+   const deleteMessage = async (messageId) => {
+      $(document).on('click', '.remove-admin-message-btn', (e) => {
+        $(e.currentTarget).css('background', '#FBE2E2');
+        $(e.currentTarget).find('img').attr('src', `${process.env.PUBLIC_URL}/images_concierge/other/icon/minus-black.svg`);
+        $(e.currentTarget).attr('id', 'ready_to_remove');
+     });
+  
+     $('body').on('click', '#ready_to_remove', async (e) => {
+        $('.remove-admin-message-btn').removeAttr('id');    
+        if (currentUser?.userId) {
+         const messageRef = ref(db, `chats/${currentUser?.userId}/messages/${messageId}`);
+         await remove(messageRef);
+       }
+     });
     };
 
    //////TRANFER DETAILS PASSENGER NUMBER HANDLE CHANGE
@@ -284,161 +300,6 @@ const ChatUser = () => {
       var chatBody = document.querySelector('#chatBody');
 
       chatBody.scrollTop = chatBody.scrollHeight;
-   }
-   
-   function GetUserChatsMessages() {
-      if (messages.length > 0) {
-         for (var i = 0; i < messages.length; i++) {
-            var appendText = '';
-
-            var msgContent = messages[i];
-            AppendDateDivider(msgContent.timestamp);
-            if (msgContent.role === 1) {
-               
-               if (msgContent.target === 'pay_status') {
-                  var payStatusData = JSON.parse(msgContent.body);
-                  if (payStatusData.status === true) {
-                     appendText = `
-                        <div class="alert alert-success">
-                           Payment successful. (Amount: $${payStatusData.total})
-                        </div>
-                     `;
-                  }
-                  else {
-                     appendText = `
-                        <div class="alert alert-danger">
-                           Payment canceled. (Amount: $${payStatusData.total})
-                        </div>
-                        `;
-                  }
-               }
-               if (msgContent.target === 'message') {
-                  appendText = `
-                     <div class="chat-messenger__content content-left content-admin" id='${msgContent.msgID}'>
-                        <div class="chat-messenger__content__container">
-                           <div class="chat-messenger__avatar">
-                              <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                                 class="img-fluid border-radius-full" alt="avatar" />
-                           </div>
-                           <div class="chat-messenger__holder">
-                              <div class="chat-messenger__text">${msgContent.body}</div>                                        
-                                 <div class="chat-messenger__statusbar">
-                                    <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(GetCurrentLocalTime(msgContent.timestamp))}</span>
-                                    <span class="chat-messenger__status"></span>
-                                 </div>
-                              </div>
-                        </div>
-                     </div>
-                  `
-               }
-               
-               if (msgContent.target === 'pay_link') {
-                  var payLink = JSON.parse(msgContent.body);
-                  appendText =
-                     `
-                     <div class="chat-messenger__content content-left content-admin" id='${msgContent.msgID}'>
-                        <div class="chat-messenger__content__container">
-                           <div class="chat-messenger__avatar">
-                                 <img src="${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png"
-                                    class="img-fluid border-radius-full" alt="avatar">
-                           </div>
-                           <div class="chat-messenger__holder">
-                                 <div class="chat-messenger__text" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-                                    Click the button to pay
-                                 </div>
-                                 <span class="chat-messenger__price">Price: $${payLink.amount}</span>
-                                 <div class="chat-messenger__statusbar">
-                                    <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(GetCurrentLocalTime(msgContent.timestamp))}</span>
-                                    <span class="chat-messenger__status"></span>
-                              </div>                                  
-                           </div>
-                        </div>
-                        <div class="chat-messenger__content__action">
-                           <a href="${payLink.url}" class="btn btn-fluid btn-primary" data-modal="modal-pay">Pay</a>
-                        </div>
-                     </div>                                 
-                  `
-               }
-               if (msgContent.target === 'main_link') {
-                  appendText = `
-                     <div class="chat-messenger__content content-left content-admin" id='${msgContent.msgID}'>
-                        <div class="chat-messenger__content__container">
-                           <div class="chat-messenger__avatar">
-                              <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                                 class="img-fluid border-radius-full" alt="avatar" />
-                           </div>
-                           <div class="chat-messenger__content__action" style="margin-right: auto; margin-left:0;">
-                              <div class="btn-group">
-                              <button id="btnHotelsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 91px">Hotels</button>
-                              <button id="btnFlightsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 92px">Flights</button>
-                              <button id="btnTransfer" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 102px">Transfer</button>
-                              <button id="btnVillageLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 138px">Budget Room</button>
-                              <button id="btnSocialTour" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 120px">Social Tour</button>
-                              </div>
-                              <div class="chat-messenger__content__info">
-                                 For group booking, please contact
-                                 <br />
-                                 <a href="mailto:hospitality@iac2023.org" class="link">hospitality@iac2023.org</a>
-                              </div>
-                              <div class="chat-messenger__statusbar">
-                              <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(GetCurrentLocalTime(msgContent.timestamp))}</span>
-                              <span class="chat-messenger__status"></span>
-                        </div>    
-                           </div>
-                        </div>
-                     </div>
-                  `;
-               }
-               if (msgContent.target === 'passport_details') {
-                  appendText = `
-                  <div class="chat-messenger__content content-left content-admin" id='${msgContent.msgID}'>
-                     <div class="chat-messenger__content__container">
-                        <div class="chat-messenger__avatar">
-                           <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                              class="img-fluid border-radius-full" alt="avatar" />
-                        </div>
-                        <div class="chat-messenger__holder">
-                           <div class="chat-messenger__text">Click button to search for passport details.</div>
-                           <div class="chat-messenger__statusbar">
-                           <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(GetCurrentLocalTime(msgContent.date))}</span>
-                           <span class="chat-messenger__status"></span>
-                        </div>    
-                        </div>
-                     </div>
-                     <div class="chat-messenger__content__action">
-                        <button id="btnOpenPassportDetails" class="btn btn-fluid btn-primary">Enter passport details</button>
-                     </div>
-                  </div>      
-                     `;
-               }
-            }
-            else {
-               // else message role USER
-               if (msgContent.target === 'message') {
-                  appendText = `
-                     <div class="chat-messenger__content content-right content-user" id='${msgContent.msgID}'>
-                        <div class="chat-messenger__content__container">
-                           <div class="chat-messenger__avatar">
-                              <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/user-avatar.png'
-                                 class="img-fluid border-radius-full" alt="avatar" />
-                           </div>
-                           <div class="chat-messenger__holder">
-                              <div class="chat-messenger__text">${msgContent.body}</div>                                       
-                              <div class="chat-messenger__statusbar">
-                                    <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(GetCurrentLocalTime(msgContent.timestamp))}</span>
-                                    <span class="chat-messenger__status ${msgContent.isRead ? 'readed' : 'sended'}"></span>
-                                 </div>
-                           </div>
-                        </div>
-                     </div>
-                  `;
-               }
-            }
-            
-            $("#chatBody").append(appendText);
-         }
-         ChatBodyScrollTo();
-      }
    }
 
    function AppendDateDivider(chatDate) {
@@ -520,238 +381,6 @@ const ChatUser = () => {
          }
       });  
      };
-
-   function InitialChatSocket() {
-      try {
-         const socket = new WebSocket('wss://monkigo.com/app/v1/concierge/chat?token=' + localStorage.getItem('token'));
-
-         socket.onopen = () => {
-            socketState.current = socket;
-            if (localStorage.getItem('store') !== null) {
-               chatStore.current = JSON.parse(localStorage.getItem('store'));
-               if (chatStore.current.length > 0) {
-                  for (var i = 0; i < chatStore.current.length; i++) {
-                     if (socketState.current.readyState === 1) {
-                        socketState.current.send(new TextEncoder().encode(JSON.stringify(chatStore.current[i])));
-                     }
-                  }
-               }
-            }
-         }
-
-         // socket.onclose = () => {
-         //    setTimeout(() => {
-         //       GetUserChatsMessages();
-         //       InitialChatSocket();
-         //    }, 1000)
-         // }
-
-         socket.onerror = (error) => {
-         }
-
-         socket.onmessage = (content) => {
-
-            var appendText = '';
-            const reader = new FileReader();
-            reader.onload = function () {
-
-               const data = new TextDecoder().decode(reader.result);
-               var msgContent = JSON.parse(data);
-              
-               if (msgContent.target === 'message') {
-                  AppendDateDivider(Date.now());
-                  appendText = Message(msgContent);
-                  var messageReadStatus = {
-                     msgID: msgContent.msgID,
-                     target: 'read'
-                  }
-                  if (socketState.current !== null) {
-                     if (socketState.current.readyState === 1) {
-                        socketState.current.send(new TextEncoder().encode(JSON.stringify(messageReadStatus)));
-                     }
-                  }
-               }
-
-               if (msgContent.target === 'read') {
-                  var message = document.getElementById(`${msgContent.msgID}`);
-                  if (message !== null) {
-                     message.querySelector('.chat-messenger__status').classList.remove('sended');
-                     message.querySelector('.chat-messenger__status').classList.remove('sending');
-                     message.querySelector('.chat-messenger__status').classList.add('readed')
-                  }
-               }
-
-               if (msgContent.target === 'read_all') {
-                  var messages = document.querySelectorAll('.content-right');
-                  if (messages !== null && messages !== undefined) {
-                     if (messages.length > 0) {
-                        for (var i = 0; i < messages.length; i++) {
-                           var message = messages[i].querySelector('.chat-messenger__status');
-                           message.classList.remove('sended');
-                           message.classList.remove('sended');
-                           message.classList.add('readed');
-                        }
-                     }
-                  }
-               }
-
-               if (msgContent.target === 'delete') {
-                  document.getElementById(msgContent.msgID).remove();
-               }
-
-               if (msgContent.target == 'chk_msg_status') {
-                  if (msgContent.Body !== '-') {
-                     localStorage.setItem('store', JSON.stringify(chatStore.current));
-
-                     var message = document.getElementById(`${msgContent.msgID}`);
-                     if (message !== null) {
-                        message.querySelector('.chat-messenger__status').classList.remove('sending');
-                        if (msgContent.isRead) {
-                           message.querySelector('.chat-messenger__status').classList.add('readed');
-                        }
-                        else {
-                           message.querySelector('.chat-messenger__status').classList.add('sended');
-                        }
-                     }
-                  }
-               }
-
-               if (msgContent.target === 'pay_status') {
-                  if (msgContent.status === true) {
-
-                     appendText = `
-              <div class="alert alert-success">
-              Payment successful. (Amount: $${msgContent.total})
-             </div>
-              `;
-                  }
-                  else {
-                     appendText = `
-               <div class="alert alert-danger">
-               Payment canceled. (Amount: $${msgContent.total})
-              </div>
-               `;
-                  }
-               }
-
-               if (msgContent.target === 'pay_link') {
-                  var payLink = JSON.parse(msgContent.body);
-                  appendText =
-                     `
-                  <div class="chat-messenger__content content-left content-admin" id='${msgContent.msgID}'>
-            <div class="chat-messenger__content__container">
-               <div class="chat-messenger__avatar">
-                     <img src="${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png"
-                        class="img-fluid border-radius-full" alt="avatar">
-               </div>
-               <div class="chat-messenger__holder">
-                     <div class="chat-messenger__text" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
-                        Click the button to pay
-                     </div>
-                     <span class="chat-messenger__price">Price: $${payLink.amount}</span>
-                     <div class="chat-messenger__statusbar">
-                        <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                        <span class="chat-messenger__status"></span>
-                    </div>                                  
-               </div>
-            </div>
-            <div class="chat-messenger__content__action">
-               <a href="${payLink.url}" class="btn btn-fluid btn-primary" data-modal="modal-pay">Pay</a>
-            </div>
-         </div>                                 
-                  `
-                  var messageReadStatus = {
-                     msgID: msgContent.msgID,
-                     target: 'read'
-                  }
-
-                  socketState.current.send(JSON.stringify(messageReadStatus));
-               }
-
-               if (msgContent.target === 'main_link') {
-                  appendText = `
-         <div class="chat-messenger__content content-left content-admin" id='${msgContent.msgID}'>
-            <div class="chat-messenger__content__container">
-               <div class="chat-messenger__avatar">
-                  <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                     class="img-fluid border-radius-full" alt="avatar" />
-               </div>
-               <div class="chat-messenger__content__action" style="margin-right: auto; margin-left:0;">
-                  <div class="btn-group">
-                  <button id="btnHotelsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 91px">Hotels</button>
-                  <button id="btnFlightsLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 92px">Flights</button>
-                  <button id="btnTransfer" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 102px">Transfer</button>
-                  <button id="btnVillageLink" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 138px">Budget Room</button>
-                  <button id="btnSocialTour" class="btn btn-outline btn-outline-sm btn-outline-primary" style="margin: 0; padding: 10px 0; min-width: 120px">Social Tour</button>
-                  </div>
-                  <div class="chat-messenger__content__info">
-                     For group booking, please contact
-                     <br />
-                     <a href="mailto:hospitality@iac2023.org" class="link">hospitality@iac2023.org</a>
-                  </div>
-                  <div class="chat-messenger__statusbar">
-                  <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                  <span class="chat-messenger__status"></span>
-              </div>    
-               </div>
-            </div>
-         </div>
-      `;
-                  var messageReadStatus = {
-                     msgID: msgContent.msgID,
-                     target: 'read'
-                  }
-                  if (socketState.current !== null) {
-                     if (socketState.current.readyState === 1) {
-                        socketState.current.send(new TextEncoder().encode(JSON.stringify(messageReadStatus)));
-                     }
-                  }
-               }
-
-               if (msgContent.target === 'passport_details') {
-                  appendText = `
-               <div class="chat-messenger__content content-left content-admin" id='${msgContent.msgID}'>
-                 <div class="chat-messenger__content__container">
-                    <div class="chat-messenger__avatar">
-                       <img src='${process.env.PUBLIC_URL}/images_concierge/template/avatar/admin-avatar.png'
-                          class="img-fluid border-radius-full" alt="avatar" />
-                    </div>
-                    <div class="chat-messenger__holder">
-                       <div class="chat-messenger__text">Click button to search for passport details.</div>
-                       <div class="chat-messenger__statusbar">
-                       <span class="chat-messenger__date">${new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(Date.now()))}</span>
-                       <span class="chat-messenger__status"></span>
-                   </div>    
-                    </div>
-                 </div>
-                 <div class="chat-messenger__content__action">
-                    <button id="btnOpenPassportDetails" class="btn btn-fluid btn-primary">Enter passport details</button>
-                 </div>
-              </div>      
-                 `;
-                  var messageReadStatus = {
-                     msgID: msgContent.msgID,
-                     target: 'read'
-                  }
-                  if (socketState.current !== null) {
-                     if (socketState.current.readyState === 1) {
-                        socketState.current.send(new TextEncoder().encode(JSON.stringify(messageReadStatus)));
-                     }
-                  }
-               }
-
-               if (msgContent.target !== 'ping') {
-                  $('#chatBody').append(appendText);
-                  ChatBodyScrollTo();
-               }
-            }
-            reader.readAsArrayBuffer(content.data);
-         }
-      }
-      catch (e) {
-
-      }
-   }
 
    function Message(message) {
       if (message.target === 'message') {
