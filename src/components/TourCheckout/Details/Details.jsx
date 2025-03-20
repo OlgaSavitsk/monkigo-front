@@ -7,6 +7,7 @@ import autoAnimate from '@formkit/auto-animate';
 import $ from 'jquery';
 import { formatDate } from '../../../utils';
 import { config } from '../../../config';
+import { refreshToken } from '../../Security/authService';
 
 const baseURL = config.baseURL;
 
@@ -65,21 +66,40 @@ const Details = ({ tourCheckOutData }) => {
      }
 
       if (type === 'T') {
-         $.ajax({
-            method: 'POST',
-            url: `${baseURL}/app/v1/payment/iac`,
-            data: JSON.stringify(orderData),
-            dataType: 'json',
-            contentType: 'application/json',
-            headers: {
-               'x-auth-key': user?.token
-            },
-            success: function ({data}) {
-               window.location.href = `${data}`
-            }
-         });
+         sendOrderRequest(orderData, user?.token);
       }
    }
+
+   function sendOrderRequest(orderData, token) {
+      $.ajax({
+         method: 'POST',
+         url: `${baseURL}/app/v1/payment/iac`,
+         data: JSON.stringify(orderData),
+         dataType: 'json',
+         contentType: 'application/json',
+         headers: {
+            'x-auth-key': token
+         },
+         success: function ({ data }) {
+            window.location.href = `${data}`;
+         },
+         error: function (xhr) {
+            console.error(xhr);
+            if (xhr.status === 401) {
+               refreshToken(
+                     (newToken) => {
+                        sendOrderRequest(orderData, newToken);
+                     },
+                     (errorMessage) => {
+                        console.error(errorMessage);
+                     }
+               );
+            } else {
+               window.location.href = '/auth';
+            }
+         }
+      });
+  }
 
    return (
       <div className="tour-checkout-details-wrapper">

@@ -36,16 +36,6 @@ const ChatAdmin = () => {
       setCurrentUser(user);
     }, [setCurrentUser]);
 
-   useEffect(() => {
-      const { token } = JSON.parse(localStorage.getItem('user'));
-      const expiringDate = localStorage.getItem('expiringDate');
-  
-      if (!token || (expiringDate && new Date(expiringDate) <= new Date())) {
-        localStorage.clear();
-        window.location.href = '/auth';
-      }
-    }, []);
-
    //////////SEND MESSAGE/////////
    const sendMessageHandler = () => {
       if ($('#messageText').val().trim() !== '') {

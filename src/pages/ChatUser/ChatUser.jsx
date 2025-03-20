@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ref, push, onValue, set, update, remove, runTransaction } from 'firebase/database';
+import { ref, push, onValue, update, remove, runTransaction } from 'firebase/database';
 import { db } from '../../firebase';
-import { useLocation } from 'react-router-dom';
 import './chatuser.scss';
 import '../../assets_concierge/styles/main.css';
 
@@ -35,9 +34,13 @@ import "swiper/css/thumbs";
 import { Pagination, FreeMode, Navigation, Thumbs } from "swiper";
 import { uid } from 'uid';
 import MessageList from './MessageList';
+import { refreshToken } from '../../components/Security/authService';
+import { useAuth } from '../../context/AuthContext';
 import { config } from '../../config';
 
 const baseURL = config.baseURL;
+const linkURL = config.linkURL;
+
 const buttons = [
    { id: "btnHotelsLink", label: "Hotels", key: "Hotels" },
    { id: "btnFlightsLink", label: "Flights", key: "Flights" },
@@ -61,6 +64,7 @@ const buttons = [
  };
 
 const ChatUser = () => {
+   const { userData, checkTokenExpiration } = useAuth();
    const [inputBarActive, setInputBarActive] = useState(false);
    const [btnSendMessage, setBtnSendMessage] = useState(false);
    const [modalContent, setModalContent] = useState(null);
@@ -108,7 +112,6 @@ const ChatUser = () => {
 
    const socketState = useRef(null);
    const chatStore = useRef([]);
-   const location = useLocation();
    var chatDateDivider_Today = false;
    var chatDateDivider_Yesterday = false;
    var chatDateDivider_Exists = [];
@@ -172,13 +175,9 @@ const ChatUser = () => {
  };
     
    useEffect(() => {
-      const { token } = JSON.parse(localStorage.getItem('user'));
+      const { token } = JSON.parse(localStorage.getItem('user')) || {};
       setToken(token)
 
-      if (!token) {
-        localStorage.clear();
-        window.location.href = '/auth';
-      }
     }, []);
 
    useEffect(() => {
@@ -247,9 +246,22 @@ const ChatUser = () => {
 
    const handleHotelsSearch = () => {
       const queryParams = new URLSearchParams();
-      queryParams.append('token', token);
-      window.location.href = `http://38.242.129.219:3000/hotels-concierge?${queryParams.toString()}`;
-    };
+      if (userData && !checkTokenExpiration(userData)) {
+         queryParams.append('token', token);
+         window.location.href = `${linkURL}/hotels-concierge?${queryParams.toString()}`;
+     } else {
+         refreshToken(
+            (newToken) => {
+               queryParams.append('token', newToken);
+               window.location.href = `${linkURL}/hotels-concierge?${queryParams.toString()}`;
+            },
+            (errorMessage) => {
+               console.error(errorMessage);
+               window.location.href = '/auth';
+            }
+         );
+      }
+   };
   
     useEffect(() => {
       $(document).on('click', '#btnHotelsSearch', handleHotelsSearch);
@@ -353,33 +365,47 @@ const ChatUser = () => {
          return;
       }
 
-      $.ajax({
-         method: "POST",
-         url: `${baseURL}/app/v1/payment/iac`,
-         data: JSON.stringify({
-            book_type: "FLIGHT",
-            currency: "USD",
-            amount: amount,
-            flights: [formMessages]
-         }),
-         dataType: "json",
-         headers: {
-            "x-auth-key": token,
-            "content-type": "application/json",
-         },
-         success: (content) => {
-            if (content.result?.status && content.data) {
-            window.location.href = content.data;
-            localStorage.removeItem(`flights_${currentUser?.userId}`);
-            } else {
-            sendMessage('Failed to create a payment session. Please try again.', {sender: 'admin'})
+      const sendRequest = (token) => {
+         $.ajax({
+             method: "POST",
+             url: `${baseURL}/app/v1/payment/iac`,
+             data: JSON.stringify({
+                 book_type: "FLIGHT",
+                 currency: "USD",
+                 amount: amount,
+                 flights: [formMessages]
+             }),
+             dataType: "json",
+             headers: {
+                 "x-auth-key": token,
+                 "content-type": "application/json",
+             },
+             success: (content) => {
+                 if (content.result?.status && content.data) {
+                     window.location.href = content.data;
+                     localStorage.removeItem(`flights_${currentUser?.userId}`);
+                 } else {
+                     sendMessage('Failed to create a payment session. Please try again.', { sender: 'admin' });
+                 }
+             },
+            error: (xhr, status, error) => {
+               console.error(error);
+               if (xhr.status === 401) {
+                  refreshToken(
+                     (newToken) => {sendRequest(newToken);},
+                     (errorMessage) => {
+                        console.error(errorMessage);
+                        sendMessage('An error occurred while refreshing the token. Please log in again.', { sender: 'admin' });
+                     }
+                  );
+               } else {
+                  sendMessage('An error occurred while sending the request. Please try again later', { sender: 'admin' });
+               }
             }
-         },
-         error: (xhr, status, error) => {
-            console.error(error);
-            sendMessage('An error occurred while sending the request. Please try again later', {sender: 'admin'})
-         }
-      });  
+         });
+     };
+ 
+     sendRequest(token);
      };
 
    function Message(message) {
@@ -1247,7 +1273,12 @@ const ChatUser = () => {
                               </div>
                            </div>
                         </div>
-                        <MessageList messages={messages} user={currentUser?.userId} sendMessage={sendMessage} handlePayment={sendPriceDetailsSubmitHandler} handledeleteMessage={deleteMessage}/>
+                        <MessageList 
+                           messages={messages}
+                           user={currentUser?.userId}
+                           sendMessage={sendMessage} 
+                           handlePayment={sendPriceDetailsSubmitHandler} 
+                           handledeleteMessage={deleteMessage}/>
                      </div>
                      <div className="chat-messenger__footer">
                         {/* <div className="chat-messenger__footer__action">
