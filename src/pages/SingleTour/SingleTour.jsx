@@ -38,7 +38,7 @@ const SingleTour = () => {
    const tour = tours?.find(t => t.info[0].id === localStorage.getItem('tourID') );
    const tourInfo = tour ? tour.info[0] : null;
     if (!tourInfo) {
-        return <div>Tour not found.</div>;
+      window.location.href = '/chat'
     }
 
    return (

@@ -4,6 +4,7 @@ import $ from 'jquery';
 
 ////IMPORT COMPONENT
 import Navbar from '../../components/Navbar/Navbar';
+import { useAuth } from '../../context/AuthContext';
 
 ////IMPORT MUI
 import Skeleton from '@mui/material/Skeleton';
@@ -14,28 +15,13 @@ import MonkeyUnSuccessful from '../../assets/payment-status/monkey-unsuccessful.
 
 
 const PaymentStatus = () => {
+   const { userData } = useAuth()
 
    const [orderData, setOrderData] = useState(null);
 
    useEffect(() => {
       const bookingCode = new URLSearchParams(window.location.search).get('bookingCode');
       setOrderData(bookingCode)
-      // $.ajax({
-      //    method: 'GET',
-      //    url: 'https://monkigo.com/app/v1/iac2023/social/tour/info',
-      //    data: {
-      //       token: localStorage.getItem('token'),
-      //       o: new URLSearchParams(window.location.search).get('o')
-      //    },
-      //    dataType: 'json',
-      //    success: (content) => {         
-      //       if (content?.data?.payStatus){
-      //          SendConfirmEmail();
-      //        }
-            
-      //       setOrderData(content.data);
-      //    }
-      // });
    }, []);
 
    function SendConfirmEmail() {
@@ -78,7 +64,7 @@ const PaymentStatus = () => {
                         }
                         {
                            orderData !== null & orderData !== undefined ?
-                              <span>{orderData  ? 'You will get a confirmation e-mail and all the details to the given address:' : 
+                              <span>{orderData  ? `You will get a confirmation e-mail and all the details to the given address: ${userData?.email}` : 
                                'Please ensure you have sufficient funds in your account and you do not exceed your credit limit.'                   
                               }</span>
                               :

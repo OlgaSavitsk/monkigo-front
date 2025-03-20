@@ -46,25 +46,6 @@ const Security = () => {
    const [signupfNameErrorContent, setSignupfNameErrorContent] = useState('');
    const [signuplNameErrorContent, setSignuplNameErrorContent] = useState('');
 
-   // function License() {
-   //    if (token === null) {
-   //       $.ajax({
-   //          method: 'GET',
-   //          url: 'https://monkigo.com/app/v1/license',
-   //          dataType: 'json',
-   //          success: (content) => {
-   //             if (content?.result.code === 200) {
-   //                if (content?.data?.token !== null && content?.data?.token.trim() !== '') {
-   //                   localStorage.clear();
-   //                   localStorage.setItem('token', content.data.token);
-   //                   setToken(content.data.token);
-   //                }
-   //             }
-   //          }
-   //       });
-   //    }
-   // }
-
    ////OTP HANDLE CHANGE
    function otpHandleChange(OTP) {
       const otpDigits = document.querySelectorAll('.inputStyle');
@@ -270,17 +251,15 @@ const Security = () => {
                dataType: 'json',
                success: (content) => {
                   if (content.result.status) {
-                     if (content.result.error === false) {
-                        if (content.data !== null) {
-                           const data = {...content.data, userId: content.data.user_preference.userid}
-                           localStorage.setItem('user', JSON.stringify(data));
-                           localStorage.setItem('token', content.data.token);
-                        }
-                        setRegistrationProgress('congrats')
-                        setTimeout(() => {
-                           window.location.href = '/chat';
-                        }, 3000)
+                     if (content.data !== null) {
+                        const data = {...content.data, userId: content.data.user_preference.userid}
+                        localStorage.setItem('user', JSON.stringify(data));
+                        localStorage.setItem('token', content.data.token);
                      }
+                     setRegistrationProgress('congrats')
+                     setTimeout(() => {
+                        setRegistrationProgress('enter-email')
+                     }, 3000)
                   }
                   else {
                      window.location.href = '/auth';
@@ -348,7 +327,7 @@ const Security = () => {
          method: 'POST',
          url: `${baseURL}/app/v1/security/signin`,
          contentType: 'application/json',
-         data: JSON.stringify({ email: email, password: signInPassword }),
+         data: JSON.stringify({ email: email, password: signInPassword || password}),
          dataType: 'json',
          success: (signInResponse) => {
             if (signInResponse.result.status === true && signInResponse.result.error === false) {
@@ -370,7 +349,9 @@ const Security = () => {
                      } else {
                         userInfo = { ...userInfo, ...userInfoResponse.data, userId: userInfoResponse.data.user_preference.userid}
                         setSignInPasswordCorrect(false);
-                        window.location.href = '/chat';
+                        setTimeout(() => {
+                           window.location.href = '/chat';
+                        }, 1000)
                      }
                      localStorage.setItem('user', JSON.stringify(userInfo));
                      localStorage.setItem('token', userInfo.token);

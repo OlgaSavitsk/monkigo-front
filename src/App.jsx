@@ -19,54 +19,28 @@ import SingleTour from './pages/SingleTour/SingleTour';
 import TourCheckout from './pages/TourCheckout/TourCheckout';
 import TourPaymentStatus from './pages/PaymentStatusTour/PaymentStatusTour';
 import Admin from './pages/ChatAdmin/Admin';
+import { useAuth } from './context/AuthContext';
+import AuthGuard from './context/AuthGuard';
 
 function App() {
-
-  function UserValidation() {
-    return new Promise((resolve) => {
-      const token = JSON.parse(localStorage.getItem('user'));
-      if (token?.token) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });
-  }
-  
-  async function Valid() {
-    const result = await UserValidation();
-    return result;
-  }
-  
-  Valid().then((value) => {
-    if (value === false) {
-      if (window.location.pathname !== '/auth' && window.location.pathname !== '/terms-conditions') {
-        window.location.href = '/auth';
-      }
-    }
-  });
-
-  function GetRole() {
-    if (localStorage.getItem('user') !== null && localStorage.getItem('user') !== undefined) {
-      return JSON.parse(localStorage.getItem('user')).support;
-    }
-    else {
-      localStorage.clear();
-    }
-  }
-
+  const { userData } = useAuth();
+  const userRole = userData ? userData.support : null;
 
   return (
-    <Router key={new Date()}>
+    <Router>
       <div className="App">
         <Routes>
           <Route 
                 path='/admin' 
-                element={GetRole() ? <Admin /> : <Navigate to="/chat" replace />} 
+                element={userRole ? <Admin /> : <Navigate to="/chat" replace />} 
             />
             <Route 
                 path='/chat' 
-                element={<ChatUser />} 
+                element={
+                  <AuthGuard>
+                      <ChatUser />
+                  </AuthGuard>
+              } 
             />
           <Route exact path='/auth' element={<Security />} />
           <Route exact path='/hotels' element={<HotelsResults />} />
@@ -79,7 +53,7 @@ function App() {
           <Route exact path='/tour' element={<SingleTour />} />
           <Route exact path='/tour-checkout' element={<TourCheckout />} />
           <Route exact path='/tour/payment-status' element={<TourPaymentStatus />} />
-          <Route path="*" element={<Navigate to={GetRole() ? "/admin" : "/chat"} replace />} />
+          <Route path="*" element={<Navigate to={userRole ? "/admin" : "/chat"} replace />} />
         </Routes>
       </div>
     </Router>
