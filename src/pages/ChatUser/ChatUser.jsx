@@ -16,10 +16,10 @@ import Banner from '../../assets_concierge/images/template/banner/banner.png';
 import Close from '../../assets_concierge/images/other/icon/close.svg';
 import CalendarImg from '../../assets_concierge/images/other/icon/calendar.svg';
 
-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
-import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TextField } from '@mui/material';
 
 import countryFile from '../../data/country.json';
 
@@ -37,6 +37,7 @@ import MessageList from './MessageList';
 import { refreshToken } from '../../components/Security/authService';
 import { useAuth } from '../../context/AuthContext';
 import { config } from '../../config';
+import { formatDate } from '../../utils';
 
 const baseURL = config.baseURL;
 const linkURL = config.linkURL;
@@ -85,7 +86,7 @@ const ChatUser = () => {
       infants: 0
    });
    const [phoneValue, setPhoneValue] = useState()
-   const [value, setValue] = React.useState([new Date().toDateString(), flightDirection === 'One way' ? null : new Date(2023, new Date().getMonth(), new Date().getDate() + 1).toDateString()]);
+   const [value, setValue] = React.useState([new Date().toDateString(), flightDirection === 'One way' ? null : new Date(2025, new Date().getMonth(), new Date().getDate() + 1).toDateString()]);
    const [iata, setIata] = useState('');
    const [iataData, setIataData] = useState(null);
    const [thumbsSwiper, setThumbsSwiper] = useState(null);
@@ -630,8 +631,8 @@ const ChatUser = () => {
             const newFlight = {
                from_city: fromInput1 || fromInput2,
                to_city: "Baku (GYD)",
-               departure_date: new Date(value[0]).toISOString().split('T')[0],
-               return_date: value[1] !== null ? new Date(value[1]).toISOString().split('T')[0] : null,
+               departure_date: formatDate(value[0]),
+               return_date: value[1] !== null ? formatDate(value[1]) : null,
                flight_type: flightClasses,
                flight_direction: flightDirection,
                adults_count: flightAdultNumber || 0,
@@ -1132,6 +1133,26 @@ const ChatUser = () => {
       })
    }, []);
 
+   const handleStartDateChange = (newValue) => {
+      const startDate = new Date(newValue);
+      if (value[1] && newValue.isSame(value[1], 'day')) {
+          const nextDay = new Date(startDate);
+          nextDay.setDate(nextDay.getDate() + 1);
+          setValue([startDate, nextDay]);
+      } else {
+          setValue([startDate, value[1]]);
+      }
+   };
+
+   const handleEndDateChange = (newValue) => {
+      const endDate = new Date(newValue);
+      setValue([value[0], endDate]);
+  
+      if (endDate) {
+          setFlightDirection('Return');
+      }
+   };
+
 
    /////BUDGET ROOMS SUBMIT HANDLER
    // const BudgetReserveSubmitHandler = () => {
@@ -1365,7 +1386,7 @@ const ChatUser = () => {
                                  >One way</span>
                                  <span
                                     className={flightDirection === 'Return' ? 'filter-list__item__dropdown__link selected' : 'filter-list__item__dropdown__link'}
-                                    onClick={() => { setFlightDirection('Return'); setValue([new Date().toDateString(), new Date(2023, new Date().getMonth(), new Date().getDate() + 1).toDateString()]) }}
+                                    onClick={() => { setFlightDirection('Return'); setValue([new Date().toDateString(), new Date(2025, new Date().getMonth(), new Date().getDate() + 1).toDateString()]) }}
                                  >Return</span>
                                  {/* <span 
                                     className={flightDirection === 'Multi City' ? 'filter-list__item__dropdown__link selected' : 'filter-list__item__dropdown__link'}
@@ -1529,48 +1550,57 @@ const ChatUser = () => {
                      </div>
 
                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateRangePicker
-                           calendars={1}
-                           disablePast
-                           label="Advanced keyboard"
-                           value={value}
-                           showToolbar={false}
-                           inputFormat="DD-MM-YYYY"
-                           onChange={(newValue) => {
-                              if (newValue[1] !== null) {
-                                 if (new Date(newValue[0].toString()).getDay() === new Date(newValue[1].toString()).getDay()) {
-                                    if (new Date(newValue[0].toString()).getDate() === new Date(newValue[1].toString()).getDate())
-                                       newValue[1] = newValue[1].add(1, 'day');
-                                 }
-                              }
-                              setValue(newValue);
-                              if (newValue[1] !== null) {
-                                 setFlightDirection('Return')
-                              }
-                           }}
-                           renderInput={(startProps, endProps) => (
-                              <React.Fragment>
-                                 <div className="form-field has-label-xl m-b-12" style={{ width: '100%' }}>
-                                    <label htmlFor="" className="float-label">Departure</label>
-                                    <input type="text" className="form-control placeholder-medium" id='departure-input'
-                                       ref={startProps.inputRef}
-                                       {...startProps.inputProps}
-                                       readOnly={true}
+                        <div>
+                           <div className="form-field has-label-xl m-b-12" style={{ width: '100%' }}>
+                              <DatePicker
+                                 label="Departure"
+                                 value={value[0]}
+                                 onChange={handleStartDateChange}
+                                 renderInput={(params) => (
+                                    <TextField 
+                                       {...params} 
+                                       variant="outlined" 
+                                       fullWidth 
+                                       InputProps={{
+                                             ...params.InputProps,
+                                             readOnly: true
+                                       }} 
+                                       sx={{
+                                          '& .MuiInputBase-root': {
+                                                borderRadius: '8px'
+                                          }
+                                       }}
                                     />
-                                 </div>
-
-                                 <div className="form-field has-label-lg m-b-12" style={{ width: '100%' }} onClick={() => setFlightDirection(flightDirection === 'One way' ? 'Return' : 'Return')}>
-                                    <label htmlFor="" className="float-label">Return</label>
-                                    <input type="text" className="form-control placeholder-medium" id='return-input'
-                                       onClick={() => setFlightDirection('Return')}
-                                       ref={endProps.inputRef}
-                                       {...endProps.inputProps}
-                                       readOnly={true}
+                                 )}
+                                 disablePast
+                              />
+                           </div>
+                           <div className="form-field has-label-lg m-b-12" style={{ width: '100%' }}>
+                              <DatePicker
+                                 label="Return"
+                                 value={value[1]}
+                                 onChange={handleEndDateChange}
+                                 renderInput={(params) => (
+                                    <TextField 
+                                       {...params} 
+                                       variant="outlined" 
+                                       fullWidth 
+                                       InputProps={{
+                                             ...params.InputProps,
+                                             readOnly: true
+                                       }} 
+                                       sx={{
+                                          '& .MuiInputBase-root': {
+                                                borderRadius: '8px'
+                                          }
+                                       }}
                                     />
-                                 </div>
-                              </React.Fragment>
-                           )}
-                        />
+                                 )}
+                                 disablePast
+                                 disabled={!value[0]}
+                              />
+                           </div>
+                        </div>
                      </LocalizationProvider>
 
                      <button className="btn btn-fluid btn-primary m-t-24" onClick={(e) => flightDetailsSubmitHandler(e)}>Submit</button>
@@ -2019,7 +2049,7 @@ const ChatUser = () => {
                      </span>
                   </label>
                   <label htmlFor="return" className="radio-list__item">
-                     <input type="radio" id="return" name="type-of-flight" onClick={() => { setFlightDirection('Return'); setValue([new Date().toDateString(), new Date(2023, new Date().getMonth(), new Date().getDate() + 1).toDateString()]) }} />
+                     <input type="radio" id="return" name="type-of-flight" onClick={() => { setFlightDirection('Return'); setValue([new Date().toDateString(), new Date(2025, new Date().getMonth(), new Date().getDate() + 1).toDateString()]) }} />
                      <span className="radio-list__item__label">Return</span>
                      <span className="radio-list__item__control" style={{ borderColor: flightDirection === 'Return' ? '#274DE0' : '#E5E5E5' }}>
                         <div className="radio-list__item__control_circle" style={{ background: flightDirection === 'Return' ? '#274DE0' : 'transparent' }}></div>
