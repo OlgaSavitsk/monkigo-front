@@ -14,17 +14,53 @@ const MessageList = ({ messages, user, sendMessage, handlePayment, handledeleteM
     }
   }, [messages]);
 
+  const renderDateDivider = (date) => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return new Intl.DateTimeFormat('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(date);
+    }
+  };
+
+  const messagesByDate = messages.reduce((acc, message) => {
+    const date = new Date(message.timestamp).toDateString();
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(message);
+    return acc;
+  }, {});
+
   return (
     <div>
-      {messages.map((message) => (
-        <MessageItem
-          key={message.id}
-          message={message}
-          user={user}
-          sendMessage={sendMessage}
-          handlePayment={handlePayment}
-          handledeleteMessage={handledeleteMessage}
-        />
+      {Object.entries(messagesByDate).map(([date, dateMessages]) => (
+        <div key={date}>
+          <div className="chat-messenger__date__divider">
+              <span>{renderDateDivider(new Date(date))}</span>
+            </div>
+          <div className="space-y-4">
+            {dateMessages.map((message) => (
+              <MessageItem
+                key={message.id}
+                message={message}
+                user={user}
+                sendMessage={sendMessage}
+                handlePayment={handlePayment}
+                handledeleteMessage={handledeleteMessage} />
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   );
@@ -225,12 +261,12 @@ const MessageItem = ({ message, user, sendMessage, handlePayment, handledeleteMe
           <div className="chat-messenger__holder">
             {config.render()}
             <div className="chat-messenger__statusbar">
-            <span className="chat-messenger__date">{formatTime(message.timestamp)}</span>
-            {(user && !isAdmin && message.sender !== "admin") ||
-              (isAdmin && !user && message.sender === "admin") ? (
+              <span className="chat-messenger__date">{formatTime(message.timestamp)}</span>
+              {(user && !isAdmin && message.sender !== "admin") ||
+                (isAdmin && !user && message.sender === "admin") ? (
                 <span className={`chat-messenger__status ${getMessageStatus(message.status)}`}></span>
               ) : null}
-          </div>
+            </div>
           </div>
         </div>
       </div>
@@ -243,13 +279,6 @@ const MessageItem = ({ message, user, sendMessage, handlePayment, handledeleteMe
 const Avatar = ({ src }) => (
   <div className="chat-messenger__avatar">
     <img src={src} className="img-fluid border-radius-full" alt="avatar" />
-  </div>
-);
-
-const StatusBar = ({ date, status }) => (
-  <div className="chat-messenger__statusbar">
-    <span className="chat-messenger__date">{date}</span>
-    <span className={`chat-messenger__status ${status}`}></span>
   </div>
 );
 
