@@ -91,7 +91,7 @@ const SocialTours = () => {
                                        <ul>
                                           {
                                              t.info && t.info.map((info, j) => (
-                                                <li key={j}>{info.time} — <a href={`/tour?id=${info.id}`} target='_blank' >{info.name}</a></li>
+                                                <li key={j}>{info.time} — <a href={`/tour?id=${info.id}`}>{info.name}</a></li>
                                              ))
                                           }
                                        </ul>
@@ -111,7 +111,7 @@ const SocialTours = () => {
                      </div>
 
                      <div className="all-tours-wrapper">
-                        <a href="/tour?id=1" target='_blank'><div className="single-tour-container">
+                        <a href="/tour?id=1"><div className="single-tour-container">
                            <div className="tour-image">
                               <img src="https://cdn.monkigo.com/tours/10a778ea57b94a96b2c1e2c327c04135/1.jpg" alt="" />
                            </div>
@@ -119,7 +119,7 @@ const SocialTours = () => {
                               <span>Old City Walking Tour</span>
                            </div>
                         </div></a>
-                        <a href="/tour?id=2" target='_blank'><div className="single-tour-container">
+                        <a href="/tour?id=2"><div className="single-tour-container">
                            <div className="tour-image">
                               <img src="https://cdn.monkigo.com/tours/79ca9b8b134f48a2ad7cbfc9cd766073/1.jpg" alt="" />
                            </div>
@@ -127,7 +127,7 @@ const SocialTours = () => {
                               <span>Fire-worshipping Heritage Tour</span>
                            </div>
                         </div></a>
-                        <a href="/tour?id=3" target='_blank'><div className="single-tour-container">
+                        <a href="/tour?id=3"><div className="single-tour-container">
                            <div className="tour-image">
                               <img src="https://cdn.monkigo.com/tours/308435f97a8843538634f65a14a2005b/1.jpg" alt="" />
                            </div>

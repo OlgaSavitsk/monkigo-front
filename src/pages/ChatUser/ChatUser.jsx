@@ -631,8 +631,8 @@ const ChatUser = () => {
             const newFlight = {
                from_city: fromInput1 || fromInput2,
                to_city: "Baku (GYD)",
-               departure_date: formatDate(value[0]),
-               return_date: value[1] !== null ? formatDate(value[1]) : null,
+               departure_date: new Date(value[0]).toISOString().split('T')[0],
+               return_date: value[1] !== null ? new Date(value[1]).toISOString().split('T')[0] : null,
                flight_type: flightClasses,
                flight_direction: flightDirection,
                adults_count: flightAdultNumber || 0,
